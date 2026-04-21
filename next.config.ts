@@ -1,26 +1,16 @@
 import type { NextConfig } from "next";
 
-/**
- * `.next-dev` is only for local `next dev` (Windows EPERM on `.next/trace`).
- * Do not use `NODE_ENV` alone: `next.config` can load before the CLI sets it, so Vercel
- * would keep emitting to `.next-dev` while the platform expects `.next`.
- */
-function resolveDistDir(): string {
-  const fromEnv = process.env.NEXT_DIST_DIR?.trim();
-  if (fromEnv) return fromEnv;
-  if (process.env.VERCEL) return ".next";
-  if (process.env.npm_lifecycle_event === "dev") return ".next-dev";
-  const argv = process.argv;
-  const isNextDevCli =
-    argv.includes("dev") && !argv.includes("build") && !argv.includes("start");
-  if (isNextDevCli) return ".next-dev";
-  return ".next";
-}
-
 const nextConfig: NextConfig = {
   /** Hide the floating Next.js dev indicator (N badge) — it overlaps mobile CTAs e.g. WhatsApp */
   devIndicators: false,
-  distDir: resolveDistDir(),
+  /**
+   * Always default to `.next` so Vercel (and any host) always finds the build output.
+   * For Windows `EPERM` on `.next/trace` during **local dev only**, create `.env.development.local`
+   * (not `.env.local` — that file is also loaded by `next build`) with:
+   * `NEXT_DIST_DIR=.next-dev`
+   * Never set `NEXT_DIST_DIR=.next-dev` in Vercel project env.
+   */
+  distDir: process.env.NEXT_DIST_DIR?.trim() || ".next",
   /** LAN access to dev server (phone / other PC) — add your IP if the warning shows another host. */
   allowedDevOrigins: ["192.168.68.114", "192.168.68.110"],
   images: {
