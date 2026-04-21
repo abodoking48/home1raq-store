@@ -1,0 +1,120 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { formatIqdNumber } from "@/lib/currency";
+import { cn } from "@/lib/utils";
+
+export type ProductCardProps = {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  compareAtPrice?: number | null;
+  onPromo?: boolean;
+  image: string | null;
+  className?: string;
+  /** أنماط Stitch: شبكة «الأكثر طلباً» مقابل بطاقات «أحدث المنتجات» الزجاجية */
+  variant?: "default" | "popular" | "latest";
+};
+
+export function ProductCard({
+  slug,
+  name,
+  price,
+  compareAtPrice,
+  onPromo,
+  image,
+  className,
+  variant = "default",
+}: ProductCardProps) {
+  const isLatest = variant === "latest";
+  const isPopular = variant === "popular";
+
+  return (
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className={cn("group", className)}
+    >
+      <Link href={`/products/${slug}`} className="block">
+        <div
+          className={cn(
+            "relative overflow-hidden transition-transform duration-300 group-hover:-translate-y-1",
+            isLatest
+              ? "rounded-[2.5rem] border border-white/[0.08] bg-white/[0.03] p-4 shadow-none backdrop-blur-xl"
+              : "glass-panel rounded-2xl border border-white/[0.08]",
+          )}
+        >
+          <div
+            className={cn(
+              "relative w-full overflow-hidden bg-[#0a0c0b]",
+              isLatest ? "mb-6 aspect-square rounded-[2rem]" : "aspect-[4/5]",
+            )}
+          >
+            {onPromo && (
+              <span className="absolute end-3 top-3 z-[1] rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow-lg">
+                عرض
+              </span>
+            )}
+            {image ? (
+              <Image
+                src={image}
+                alt={name}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition duration-500 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#161817] to-[#020403] text-4xl text-muted-foreground/40">
+                —
+              </div>
+            )}
+            {!isPopular && !isLatest && (
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            )}
+          </div>
+          <div className={cn("space-y-2", isLatest ? "px-2 pb-2" : "p-4 md:p-6")}>
+            <h3
+              className={cn(
+                "font-heading font-bold leading-snug text-foreground",
+                isLatest ? "text-2xl" : "text-lg",
+              )}
+            >
+              {name}
+            </h3>
+            <div
+              className={cn(
+                "flex items-end justify-between gap-3 border-t border-white/5 pt-3",
+                isPopular && "pt-4",
+              )}
+            >
+              <div>
+                {compareAtPrice != null && compareAtPrice > price && (
+                  <span className="mb-0.5 block text-sm text-muted-foreground line-through decoration-white/40">
+                    {formatIqdNumber(compareAtPrice)}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    "block font-black tabular-nums text-primary",
+                    isLatest ? "text-2xl" : "text-xl",
+                  )}
+                >
+                  {formatIqdNumber(price)}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  دينار عراقي
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}

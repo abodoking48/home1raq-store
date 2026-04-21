@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed": "#72fbbd",
+                        "surface-container-high": "#201f1f",
+                        "surface-bright": "#2c2c2c",
+                        "surface-variant": "#262626",
+                        "on-tertiary-container": "#004956",
+                        "on-primary": "#006532",
+                        "on-primary-fixed-variant": "#006632",
+                        "tertiary-fixed": "#00dcff",
+                        "primary": "#a4ffb9",
+                        "surface-tint": "#a4ffb9",
+                        "tertiary-dim": "#00cdee",
+                        "surface": "#0e0e0e",
+                        "on-surface": "#ffffff",
+                        "on-error-container": "#ffa8a3",
+                        "on-tertiary": "#005361",
+                        "surface-container": "#1a1919",
+                        "on-primary-container": "#005b2c",
+                        "inverse-on-surface": "#565554",
+                        "on-secondary-fixed-variant": "#006946",
+                        "on-tertiary-fixed-variant": "#005361",
+                        "on-secondary": "#005e3e",
+                        "error-container": "#9f0519",
+                        "secondary-fixed-dim": "#63ecaf",
+                        "on-tertiary-fixed": "#00333d",
+                        "on-secondary-fixed": "#004930",
+                        "on-secondary-container": "#e1ffeb",
+                        "surface-dim": "#0e0e0e",
+                        "primary-container": "#00fd87",
+                        "surface-container-lowest": "#000000",
+                        "inverse-surface": "#fcf8f8",
+                        "secondary-container": "#006c49",
+                        "secondary": "#72fbbd",
+                        "inverse-primary": "#006e37",
+                        "surface-container-low": "#131313",
+                        "tertiary-fixed-dim": "#00cdee",
+                        "on-error": "#490006",
+                        "secondary-dim": "#63ecaf",
+                        "outline": "#777575",
+                        "on-background": "#ffffff",
+                        "surface-container-highest": "#262626",
+                        "tertiary": "#7ee6ff",
+                        "error-dim": "#d7383b",
+                        "primary-fixed": "#00fd87",
+                        "tertiary-container": "#00dcff",
+                        "background": "#0e0e0e",
+                        "on-primary-fixed": "#004621",
+                        "error": "#ff716c",
+                        "primary-fixed-dim": "#00ed7e",
+                        "outline-variant": "#494847",
+                        "on-surface-variant": "#adaaaa",
+                        "primary-dim": "#00ed7e"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["IBM Plex Sans Arabic"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(0, 253, 135, 0.2);
+        }
+        .product-card:hover .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-color: rgba(0, 253, 135, 0.3);
+        }
+    </style>
+</head>
+<body class="text-on-surface overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#0e0e0e]/40 backdrop-blur-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-gradient-to-br from-white/5 to-transparent">
+<div class="flex flex-row-reverse justify-between items-center w-full px-8 h-20 font-['Plus_Jakarta_Sans'] tracking-tight">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-white/70 hover:bg-white/10 p-2 rounded-full transition-all cursor-pointer" data-icon="shopping_cart">shopping_cart</span>
+<span class="material-symbols-outlined text-white/70 hover:bg-white/10 p-2 rounded-full transition-all cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-[#00fd87] font-bold border-b-2 border-[#00fd87] pb-1" href="#">أجهزة المطبخ</a>
+<a class="text-white/70 hover:text-[#00fd87] transition-all" href="#">الإلكترونيات</a>
+<a class="text-white/70 hover:text-[#00fd87] transition-all" href="#">المنزل الذكي</a>
+<a class="text-white/70 hover:text-[#00fd87] transition-all" href="#">العروض</a>
+</div>
+<div class="text-2xl font-black text-[#00fd87] drop-shadow-[0_0_8px_rgba(0,253,135,0.4)]">
+                Home1raq
+            </div>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-8 min-h-screen flex flex-row gap-8 max-w-[1600px] mx-auto">
+<!-- Sidebar Filter -->
+<aside class="hidden lg:flex flex-col w-72 sticky top-32 h-[calc(100vh-160px)]">
+<div class="glass-panel rounded-xl p-8 flex flex-col gap-8 h-full">
+<div>
+<h3 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        الفلاتر
+                    </h3>
+<div class="space-y-6">
+<div>
+<span class="text-sm font-medium text-white/50 block mb-3">التصنيف</span>
+<div class="space-y-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant group-hover:border-primary transition-colors flex items-center justify-center">
+<div class="w-2.5 h-2.5 bg-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-sm text-white/80">خلاطات وعصارات</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-primary bg-primary/10 transition-colors flex items-center justify-center">
+<div class="w-2.5 h-2.5 bg-primary rounded-sm"></div>
+</div>
+<span class="text-sm text-primary">ماكينات القهوة</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant group-hover:border-primary transition-colors flex items-center justify-center">
+<div class="w-2.5 h-2.5 bg-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-sm text-white/80">أفران هوائية</span>
+</label>
+</div>
+</div>
+<div>
+<span class="text-sm font-medium text-white/50 block mb-3">السعر (د.ع)</span>
+<div class="h-1 w-full bg-outline-variant rounded-full relative">
+<div class="absolute inset-y-0 right-0 left-1/4 bg-primary rounded-full"></div>
+<div class="absolute -top-1.5 right-0 w-4 h-4 bg-primary rounded-full shadow-lg cursor-pointer"></div>
+<div class="absolute -top-1.5 left-1/4 w-4 h-4 bg-primary rounded-full shadow-lg cursor-pointer"></div>
+</div>
+<div class="flex justify-between mt-4 text-xs text-white/40">
+<span>250,000</span>
+<span>50,000</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<button class="w-full py-4 rounded-xl bg-surface-container-highest border border-outline-variant text-white font-medium hover:bg-white/10 transition-all active:scale-95">
+                        إعادة تعيين
+                    </button>
+</div>
+</div>
+</aside>
+<!-- Content Area -->
+<div class="flex-1">
+<!-- Header Section -->
+<div class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+<div>
+<nav class="flex gap-2 text-xs text-white/40 mb-3">
+<span>الرئيسية</span>
+<span>/</span>
+<span class="text-primary">أجهزة المطبخ</span>
+</nav>
+<h1 class="text-4xl font-bold tracking-tight mb-2">أجهزة المطبخ الممتازة</h1>
+<p class="text-white/50 max-w-lg leading-relaxed">اكتشف مجموعتنا المختارة من أجهزة المطبخ عالية التقنية المصممة للمنازل العصرية في العراق.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-white/40" data-icon="sort">sort</span>
+<select class="bg-surface-container-low border-none rounded-xl pr-12 pl-6 py-3 text-sm focus:ring-1 focus:ring-primary/40 appearance-none min-w-[180px]">
+<option>الأحدث أولاً</option>
+<option>السعر: من الأقل</option>
+<option>السعر: من الأعلى</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="High-end espresso machine" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="ultra-modern chrome espresso machine with steam wand and minimalist control panel on a reflective black glass surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1u7Z75NA0-a37oL1kiX-VbYj1rU39Es_DD6GCvmWhd8WLJd19l1PqJOnmKf_9aUGT2DhJE9B3e94PKZC0FHlBQu53Y5UXoCXM-zqbzO-GwKV9XXMRfYLqFndZ3f1bLA7xNw1sqH2GHsmT5Wje2YE8H3es0XP11Dr_51kUK3BXLg8-ReNQwiC0d4WH5UkCEyWI6Sj6Sj114oQcn_C85pKAfuhT653kKjVOnTAROkexzDbqi3NwjEoyF79Z6iq5bO81YWOnjK3UnGCo"/>
+<div class="absolute top-4 right-4 bg-primary-container/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-primary-container border border-primary-container/30 uppercase tracking-widest">
+                                Premium
+                            </div>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">ماكينة اسبريسو فيلوتشي</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">تحكم رقمي كامل بلمسة واحدة لقهوة مثالية كل صباح.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">450,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="Smart air fryer" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="sleek matte black air fryer with glowing digital interface and rose gold accents in a cinematic dark kitchen setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxU9FO9sYEe-74Qo4knFH0ZRdknuAYey0etCc3iF94BRvfBdTY5BN0mHz7oUz5cZ8M5IRJbSREW7zKPzBo-uEgMfTPl8Wj-iIW4wWmarlabc9Lsj_7l3daG0coakZYHRPcEEiQ3ly_b-1Y8666rbYVeAQRtlksFH9PLzO9V66b0efhj4SP_4VxQT8rbALHFcJkL9yU8zgNb8ku9eOFJX9W3zXdEYzrMvPHHWuOg0u-GpOzmIVgNO_1SwIPov3ZK1mYytJnPNV6yyBt"/>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">مقلاة هوائية ذكية بلس</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">سعة 8 لتر مع تقنية الطهي الموحد وشاشة لمس تفاعلية.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">185,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="Pro blender" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="industrial grade kitchen blender with powerful motor base and glass jar against a dark moody background with green light highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM4Fm0REhKjBg9uDGUe079O_L0JhCBYLx1Ml7VG-bt7ntEHZW_aZIDdzhxZ3zQOIYZi9bw66LsDBL1UkzHIHaMoJ4Y1V7mRRgdYRXuuXFDvgCaC6SB6eeiHdVMkhRJefsZn2xuvzYW33RcVPKkgzPlfDQVJWcvoowxUxHRgUlNul1hwwu-RNdqrLSBemd09Am8DVKFHLSTJodHhIbaxoO-iJb2GmNBOkarv_yMyunDSrmQIRATJTemCfmAGf7-OaFvhe9ISBAYsria"/>
+<div class="absolute top-4 right-4 bg-tertiary-container/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-tertiary-container border border-tertiary-container/30 uppercase tracking-widest">
+                                New
+                            </div>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">خلاط احترافي 2000 واط</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">شفرات تيتانيوم صلبة لسحق الثلج وتحضير العصائر في ثوانٍ.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">120,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="Multi-cooker" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="advanced multi-functional pressure cooker with stainless steel finish and digital display in a minimalist kitchen setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUKEuC5-eKJ777J3DMLT1DovoErsjVQ5zLUk8oD23tJA73orOPg5_6eKtujUB5QTLA9uAlOfNXC6B4MfhGLJqDJFKP-jsqQOX-xesv2JmX36fgQwTmXlq-yoSYa6ZMcTTpq3lPD2gIfJew5pbUZugN4zzeSjeR5fCANZm4uAhYledq2erfCs0w1q0VmRpKLxAupfvEHY84igRLX9K79SL99bX7bJqu-uwFlC8PsVzo63nPYrGCXcvjrE16tK9m-JYZ63poP7F0IeUd"/>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">طباخ متعدد الوظائف</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">12 برنامج طهي مسبق لطهي الأرز واللحوم والشوربات بذكاء.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">95,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="Electric Kettle" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="sleek glass electric kettle with internal blue LED light and stainless steel base on a dark granite countertop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp-7Lr6BLQXJZsDYALBvd6JIYcVZ7hGXJqh7mcAkMpmP2wSpnaEPNQmKixsD9Wmf6411DvIGHHdRG7QKbzn_XlS0mf95m9cJLn-2i0jGiXo5XIU9ONZEOwh_aNqDlbStHdd0Wg4TdLfaxIT06egrRBUeUKDPgNA1NGSOU95UBELdwsov_03EbkfWO9lcPoB1ZrviLbxsBh-5rjQTNn_uIBXdYqT-9q5YptoYLcEeEDELvg4BPBYDNxeyuWJ0fWBOiVBscVTjBJJpEm"/>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">غلاية مياه زجاجية فاخرة</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">إضاءة LED مدمجة مع نظام غلق آلي للحماية من الغليان الجاف.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">45,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="product-card group relative">
+<div class="glass-panel rounded-[2rem] p-6 transition-all duration-500 h-full flex flex-col">
+<div class="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gradient-to-b from-white/5 to-transparent flex items-center justify-center p-8">
+<img alt="Smart Toaster" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" data-alt="modern 4-slice toaster with wide slots and digital countdown timer in a bright minimalist setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2CsNg2nLfYoNJFmUv9NHOwd2SCg4qvFD3jTaZ4g0r5uHlXduxEMHhH2R0tZWHg43RdxFJ-FZHNhAL8jOl5yE66q6hX7lMeOF-7rc8wrIgacGwo5jD3_D5ThXntdzICJ86u4IhwFSPY8yfFeKIfT3G-h_CAE7SGCSezECE_2WoB1O3H-rJTpCB-gGpYStAqT0OTwCLS7HUhWmsR8HaQjfHi-4eiUJvMbUDov7jtTRF23xS0qHSctReX7UAQcTwsY7Sjzp89J_CKZbQ"/>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="text-xl font-bold mb-2">محمصة خبز رقمية 4 شرائح</h3>
+<p class="text-white/40 text-xs mb-6 line-clamp-2">7 مستويات تحميص مع شاشة عرض للعد التنازلي ووظيفة إذابة الثلج.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-2xl drop-shadow-[0_0_10px_rgba(0,253,135,0.3)]">65,000</span>
+<span class="text-[10px] text-white/30 font-medium">دينار عراقي</span>
+</div>
+<button class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center hover:shadow-[0_0_20px_rgba(0,253,135,0.4)] active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-20 flex justify-center items-center gap-4">
+<button class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center text-white hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-xl bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 rounded-xl bg-surface-container-high text-white hover:bg-white/10 transition-all">2</button>
+<button class="w-10 h-10 rounded-xl bg-surface-container-high text-white hover:bg-white/10 transition-all">3</button>
+</div>
+<button class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center text-white hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-20 rounded-t-[2rem] bg-[#0e0e0e]/80 backdrop-blur-[30px] font-['IBM_Plex_Sans_Arabic'] text-sm text-white/60">
+<div class="flex flex-col md:flex-row-reverse justify-between items-center px-12 py-10 gap-6 border-t border-white/5">
+<div class="text-lg font-bold text-white">Home1raq</div>
+<div class="flex gap-8">
+<a class="hover:text-[#00fd87] transition-colors" href="#">الشروط والأحكام</a>
+<a class="hover:text-[#00fd87] transition-colors" href="#">سياسة الخصوصية</a>
+<a class="hover:text-[#00fd87] transition-colors" href="#">تواصل معنا</a>
+</div>
+<div class="ltr text-xs">© 2024 Home1raq. جميع الحقوق محفوظة</div>
+</div>
+</footer>
+<!-- FAB for Support (Contextual) -->
+<button class="fixed bottom-8 left-8 w-16 h-16 rounded-full bg-primary-container text-on-primary-container shadow-2xl flex items-center justify-center active:scale-95 transition-transform z-40 group">
+<span class="material-symbols-outlined text-2xl" data-icon="chat_bubble">chat_bubble</span>
+<div class="absolute right-full mr-4 bg-surface-container-highest px-4 py-2 rounded-xl text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            هل تحتاج مساعدة؟
+        </div>
+</button>
+</body></html>

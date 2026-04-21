@@ -29,6 +29,16 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Cursor: Supabase MCP
+
+Supabase MCP is configured at the workspace root: `Home1raq/.cursor/mcp.json` (alongside `.cursor/settings.json` which enables the Supabase plugin).
+
+1. In [Supabase Dashboard](https://supabase.com/dashboard) → your project → **Project Settings → General**, copy **Reference ID** (project ref).
+2. Edit `d:\Home1raq\.cursor\mcp.json` and replace `REPLACE_WITH_PROJECT_REF` in the `supabase` URL with that ID.
+3. In Cursor: **Settings → Cursor Settings → Tools & MCP**, ensure **supabase** appears and connect (restart Cursor if needed). Complete the browser OAuth step when prompted.
+4. If the server does not show up, add the same `supabase` block to `%USERPROFILE%\.cursor\mcp.json` (Cursor merges user + project MCP in most builds).
+5. Docs: [Supabase MCP](https://supabase.com/docs/guides/getting-started/mcp). `read_only=true` is set in the URL for safety — use a dev project, not production.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

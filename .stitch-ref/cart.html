@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home1raq - Smart Cart</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#00cdee",
+                        "primary-fixed": "#00fd87",
+                        "tertiary-dim": "#00cdee",
+                        "on-surface-variant": "#adaaaa",
+                        "surface-container-lowest": "#000000",
+                        "inverse-on-surface": "#565554",
+                        "on-primary": "#006532",
+                        "secondary": "#72fbbd",
+                        "error": "#ff716c",
+                        "primary-fixed-dim": "#00ed7e",
+                        "surface": "#0e0e0e",
+                        "secondary-dim": "#63ecaf",
+                        "on-primary-container": "#005b2c",
+                        "on-secondary": "#005e3e",
+                        "error-container": "#9f0519",
+                        "primary-container": "#00fd87",
+                        "surface-variant": "#262626",
+                        "secondary-fixed": "#72fbbd",
+                        "on-tertiary-container": "#004956",
+                        "on-primary-fixed-variant": "#006632",
+                        "surface-tint": "#a4ffb9",
+                        "on-secondary-container": "#e1ffeb",
+                        "inverse-surface": "#fcf8f8",
+                        "surface-container-highest": "#262626",
+                        "on-primary-fixed": "#004621",
+                        "surface-dim": "#0e0e0e",
+                        "on-error": "#490006",
+                        "on-tertiary-fixed-variant": "#005361",
+                        "on-secondary-fixed-variant": "#006946",
+                        "inverse-primary": "#006e37",
+                        "outline-variant": "#494847",
+                        "surface-container-high": "#201f1f",
+                        "error-dim": "#d7383b",
+                        "tertiary": "#7ee6ff",
+                        "surface-container-low": "#131313",
+                        "surface-bright": "#2c2c2c",
+                        "on-background": "#ffffff",
+                        "background": "#0e0e0e",
+                        "primary": "#a4ffb9",
+                        "surface-container": "#1a1919",
+                        "secondary-fixed-dim": "#63ecaf",
+                        "primary-dim": "#00ed7e",
+                        "secondary-container": "#006c49",
+                        "on-tertiary": "#005361",
+                        "on-secondary-fixed": "#004930",
+                        "tertiary-fixed": "#00dcff",
+                        "tertiary-container": "#00dcff",
+                        "on-tertiary-fixed": "#00333d",
+                        "on-surface": "#ffffff",
+                        "on-error-container": "#ffa8a3",
+                        "outline": "#777575"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["IBM Plex Sans Arabic"],
+                        "label": ["IBM Plex Sans Arabic"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e;
+            color: #ffffff;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glowing-btn {
+            box-shadow: 0 0 20px rgba(0, 253, 135, 0.2);
+        }
+        .glowing-btn:hover {
+            box-shadow: 0 0 35px rgba(0, 253, 135, 0.4);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e0e0e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container/30">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-neutral-900/40 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-gradient-to-br from-white/5 to-transparent border-none">
+<div class="flex flex-row-reverse justify-between items-center px-8 h-20 w-full font-['Plus_Jakarta_Sans','IBM_Plex_Sans_Arabic'] leading-relaxed">
+<div class="text-2xl font-black tracking-tighter text-emerald-400">Home1raq</div>
+<nav class="hidden md:flex flex-row-reverse items-center gap-10">
+<a class="text-emerald-400 border-b-2 border-emerald-400 pb-1 transition-all duration-300" href="#">الرئيسية</a>
+<a class="text-neutral-400 hover:bg-white/10 px-4 py-1 rounded-lg transition-all duration-300" href="#">المتجر</a>
+<a class="text-neutral-400 hover:bg-white/10 px-4 py-1 rounded-lg transition-all duration-300" href="#">العروض</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-emerald-400 hover:scale-110 transition-transform" data-icon="shopping_cart">shopping_cart</button>
+<button class="material-symbols-outlined text-neutral-400 hover:scale-110 transition-transform" data-icon="language">language</button>
+<button class="material-symbols-outlined text-neutral-400 hover:scale-110 transition-transform" data-icon="person">person</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 px-4 md:px-12 max-w-[1600px] mx-auto min-h-screen">
+<!-- Page Title Editorial -->
+<div class="mb-16 text-right">
+<h1 class="text-5xl md:text-7xl font-bold font-headline mb-4 tracking-tight">إتمام الطلب <span class="text-primary-container">الذكي</span></h1>
+<p class="text-on-surface-variant text-lg max-w-2xl ml-auto">قم بتأكيد طلبك بسرعة وسهولة عبر نظام الشراء المباشر العراقي. نحن نوفر لك تجربة تسوق آمنة وسريعة.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+<!-- Left Side: Iraqi Quick Order Form (5 cols) -->
+<div class="lg:col-span-5 order-2 lg:order-1">
+<div class="glass-panel p-8 md:p-10 rounded-[2rem] relative overflow-hidden">
+<!-- Surface shift instead of border -->
+<div class="absolute inset-0 bg-surface-container-low/30 -z-10"></div>
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary-fixed text-3xl" data-icon="bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<h2 class="text-2xl font-bold tracking-wide">طلب سريع (العراق)</h2>
+</div>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="text-sm text-on-surface-variant px-1">الاسم الكامل</label>
+<input class="w-full bg-surface-container-high/50 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary-container/20 text-on-surface placeholder:text-neutral-600 transition-all" placeholder="مثال: محمد علي كمال" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm text-on-surface-variant px-1">رقم الهاتف</label>
+<div class="relative">
+<input class="w-full bg-surface-container-high/50 border-none rounded-xl p-4 pl-12 focus:ring-2 focus:ring-primary-container/20 text-on-surface placeholder:text-neutral-600 transition-all" dir="ltr" placeholder="07XXXXXXXX" type="tel"/>
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 text-sm border-r border-neutral-700 pr-3">+964</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-sm text-on-surface-variant px-1">المدينة</label>
+<select class="w-full bg-surface-container-high/50 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary-container/20 text-on-surface transition-all appearance-none">
+<option>بغداد</option>
+<option>البصرة</option>
+<option>أربيل</option>
+<option>الموصل</option>
+<option>النجف</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-sm text-on-surface-variant px-1">المنطقة</label>
+<input class="w-full bg-surface-container-high/50 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary-container/20 text-on-surface placeholder:text-neutral-600 transition-all" placeholder="اسم الحي" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm text-on-surface-variant px-1">العنوان بالتفصيل</label>
+<textarea class="w-full bg-surface-container-high/50 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary-container/20 text-on-surface placeholder:text-neutral-600 transition-all" placeholder="أقرب نقطة دالة، رقم الزقاق..." rows="3"></textarea>
+</div>
+<div class="pt-4">
+<button class="glowing-btn w-full bg-primary-container text-on-primary-container py-5 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3" type="submit">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+                                تأكيد الطلب
+                            </button>
+</div>
+</form>
+<!-- Trust Badges -->
+<div class="mt-10 grid grid-cols-3 gap-4 text-center">
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-neutral-500" data-icon="verified_user">verified_user</span>
+<span class="text-[10px] text-on-surface-variant">دفع آمن</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-neutral-500" data-icon="local_shipping">local_shipping</span>
+<span class="text-[10px] text-on-surface-variant">توصيل سريع</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-neutral-500" data-icon="assignment_return">assignment_return</span>
+<span class="text-[10px] text-on-surface-variant">إرجاع سهل</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Cart Summary (7 cols) -->
+<div class="lg:col-span-7 order-1 lg:order-2">
+<div class="glass-panel p-8 md:p-10 rounded-[2rem]">
+<div class="flex items-center justify-between mb-10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed text-3xl" data-icon="shopping_bag" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+<h2 class="text-2xl font-bold tracking-wide">ملخص السلة</h2>
+</div>
+<span class="bg-surface-container-highest px-4 py-1 rounded-full text-sm font-medium text-primary-fixed">3 عناصر</span>
+</div>
+<!-- Cart List -->
+<div class="space-y-8 mb-12">
+<!-- Item 1 -->
+<div class="flex items-center gap-6 group">
+<div class="w-24 h-24 rounded-2xl overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="high-end smartphone with sleek black design on dark reflective surface with neon green accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDX4FS32NEg2xbB-W3wjAc8oGgc5wHNGDshXPQDJKWRFgqScNnQR1FFpWcq4wxoDewHsGmEvfgJf0_8-l_66xgsISeeO6hB3AzWdksZlWkeiLh9Y-oeFHaUXYGFKtAcJl6lPS43K28sLWxKbdnghqmLxHaLO0ZHIh3-7MKYhOTiVfSD7zMQ_gbVcEolHLUoBXkHnzr_aWuDD4bM1hheZCyf5UfNs4J3M4S8FMNmKZ-B4LLVMFLQQGSkyKyPK8gC8sIlJcTeEo5QUhg"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold">هاتف سامسونج S24 Ultra</h3>
+<button class="material-symbols-outlined text-neutral-600 hover:text-error transition-colors" data-icon="close">close</button>
+</div>
+<p class="text-sm text-neutral-500 mb-4">أسود تيتانيوم - 512 جيجابايت</p>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-4 bg-surface-container-low px-3 py-1 rounded-xl border border-white/5">
+<button class="material-symbols-outlined text-sm hover:text-primary-container" data-icon="remove">remove</button>
+<span class="font-bold text-sm">1</span>
+<button class="material-symbols-outlined text-sm hover:text-primary-container" data-icon="add">add</button>
+</div>
+<span class="text-lg font-bold font-headline">1,450,000 د.ع</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-6 group">
+<div class="w-24 h-24 rounded-2xl overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="minimalist white tablet pro on charcoal grey background with dramatic studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjER-vlRy9eSziZJ2TC5mbSBPwvOaJUet9wTjKr6A62iajyVVMu4-LNARHNZPOS6tfTQD_Au5nH25RFd-MJnxtqthEkcviUgchtoBFL-HNL6Pm9641twpBP_wqzi5dskmWNX9SZIlBRGQZ_fhDEOXSGCUIcMNlRdrJBIloXsj4W7mqaUFjY6Ad2_O2MtUCGeXUPfVd94MAzljmAlXaeCh2MdbSPU7ENu3_qz6W9bwf72ifs7GwJkBvk_XH8F_KiCD8D4WGX0M5Iukc"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold">آيباد برو M4</h3>
+<button class="material-symbols-outlined text-neutral-600 hover:text-error transition-colors" data-icon="close">close</button>
+</div>
+<p class="text-sm text-neutral-500 mb-4">فضي - 11 بوصة</p>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-4 bg-surface-container-low px-3 py-1 rounded-xl border border-white/5">
+<button class="material-symbols-outlined text-sm hover:text-primary-container" data-icon="remove">remove</button>
+<span class="font-bold text-sm">1</span>
+<button class="material-symbols-outlined text-sm hover:text-primary-container" data-icon="add">add</button>
+</div>
+<span class="text-lg font-bold font-headline">1,200,000 د.ع</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Summary Logic -->
+<div class="bg-surface-container-low/40 rounded-3xl p-8 space-y-4">
+<div class="flex justify-between text-on-surface-variant">
+<span>المجموع الفرعي</span>
+<span class="font-headline">2,650,000 د.ع</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>أجور التوصيل (بغداد)</span>
+<span class="text-primary-container">مجاني</span>
+</div>
+<div class="pt-4 border-t border-white/10 flex justify-between items-center">
+<span class="text-xl font-bold">الإجمالي الكلي</span>
+<div class="text-right">
+<div class="text-3xl font-black font-headline text-primary-container">2,650,000 د.ع</div>
+<p class="text-[10px] text-neutral-500 mt-1">شامل ضريبة القيمة المضافة</p>
+</div>
+</div>
+</div>
+<!-- Shipping Est -->
+<div class="mt-8 flex items-center gap-4 p-4 rounded-2xl bg-primary-container/5 border border-primary-container/10">
+<span class="material-symbols-outlined text-primary-container" data-icon="schedule">schedule</span>
+<p class="text-sm">الوقت المقدر للتوصيل: <span class="font-bold">24 - 48 ساعة</span></p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="w-full py-12 px-8 border-t border-white/5 bg-neutral-950/80 backdrop-blur-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto font-['IBM_Plex_Sans_Arabic'] text-xs text-neutral-500">
+<div class="space-y-4">
+<div class="text-lg font-bold text-neutral-200">Home1raq</div>
+<p class="leading-loose">المنصة الرائدة في العراق لتسوق الأجهزة الذكية والمنزلية بأحدث التقنيات وأفضل الأسعار.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
+<a class="hover:text-emerald-400 transition-colors" href="#">من نحن</a>
+<a class="hover:text-emerald-400 transition-colors" href="#">اتصل بنا</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="hover:text-emerald-400 transition-colors" href="#">سياسة الخصوصية</a>
+<a class="hover:text-emerald-400 transition-colors" href="#">الشروط والأحكام</a>
+</div>
+</div>
+<div class="flex flex-col items-start md:items-end gap-6">
+<div class="flex gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:text-emerald-400" data-icon="facebook">social_leaderboard</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-emerald-400" data-icon="photo_camera">photo_camera</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-emerald-400" data-icon="alternate_email">alternate_email</span>
+</div>
+<p>© 2024 Home1raq. جميع الحقوق محفوظة</p>
+</div>
+</div>
+</footer>
+<!-- Subtle Background Element -->
+<div class="fixed top-1/4 -right-24 w-[500px] h-[500px] bg-primary-container/5 rounded-full blur-[120px] -z-20 pointer-events-none"></div>
+<div class="fixed bottom-0 -left-24 w-[400px] h-[400px] bg-tertiary-container/5 rounded-full blur-[100px] -z-20 pointer-events-none"></div>
+</body></html>
