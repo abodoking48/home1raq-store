@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /** Hide the floating Next.js dev indicator (N badge) — it overlaps mobile CTAs e.g. WhatsApp */
+  devIndicators: false,
   /**
    * Default `.next-dev` avoids Windows `EPERM` on a locked `/.next/trace` (zombie node, AV).
    * Override with `NEXT_DIST_DIR=.next` in `.env.local` if you need the default folder name.
