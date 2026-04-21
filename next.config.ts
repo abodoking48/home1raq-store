@@ -4,10 +4,13 @@ const nextConfig: NextConfig = {
   /** Hide the floating Next.js dev indicator (N badge) — it overlaps mobile CTAs e.g. WhatsApp */
   devIndicators: false,
   /**
-   * Default `.next-dev` avoids Windows `EPERM` on a locked `/.next/trace` (zombie node, AV).
-   * Override with `NEXT_DIST_DIR=.next` in `.env.local` if you need the default folder name.
+   * Dev: `.next-dev` avoids Windows `EPERM` on a locked `/.next/trace` (zombie node, AV).
+   * Production / `next build` (incl. Vercel): must be `.next` — deploy hosts look for that path.
+   * Override anytime with `NEXT_DIST_DIR` in env.
    */
-  distDir: process.env.NEXT_DIST_DIR?.trim() || ".next-dev",
+  distDir:
+    process.env.NEXT_DIST_DIR?.trim() ||
+    (process.env.NODE_ENV === "production" ? ".next" : ".next-dev"),
   /** LAN access to dev server (phone / other PC) — add your IP if the warning shows another host. */
   allowedDevOrigins: ["192.168.68.114", "192.168.68.110"],
   images: {
