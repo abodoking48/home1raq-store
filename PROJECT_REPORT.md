@@ -2,9 +2,28 @@
 
 **Document purpose:** Living technical reference for the `home1raq-store` codebase — use it to recall **architecture**, **decisions**, **what shipped**, and **how to operate** the project.
 
-**Last updated:** 2026-04-21 (audit: ESLint hygiene, dead code removal, landing image constant, project health).
+**Last updated:** 2026-04-24 (homepage grids + slug matching, landing countdown semantics, admin delete UX, product delete vs orders, report refresh).
 
 > **Status:** The project is **still under development**; core storefront + admin + orders + **campaign landing pages** (per-slug, optional multi-product slider) are usable; newsletter, payments, and hardening remain partial.
+
+> **Agent checkpoint:** Use **Section 12 (Changelog)** and the **“آخر تحديثات — 2026-04-24”** block as the canonical “where we left off”. After meaningful work, append **one changelog row**, bump **Last updated**, and align any **Architecture** bullets with `schema.prisma` + the files cited here.
+
+---
+
+## آخر تحديثات — 2026-04-24
+
+**سلوك وواجهات:**
+
+- **عدّاد الهبوط (`useEvergreenCountdown`):** مدة ثابتة من أول زيارة، **بدون تجديد تلقائي** بعد الصفر؛ مفتاح `localStorage` مرتبط بـ **`landingPageSlug` + `productId`** (`…:slug:{slug}:{productId}`)؛ عند الانتهاء تبقى الأرقام على `00:00:00` ورسالة مثل «انتهى العرض» في مكوّنات العدّاد — انظر `src/hooks/use-evergreen-countdown.ts` و`landing-inline-countdown.tsx` / `landing-offer-countdown.tsx` وربط `meta.slug` من `LandingPageView` → `ProductFirstSlider`.
+- **الصفحة الرئيسية — المنتجات:** شبكة **عمودين على الجوال** (`grid-cols-[repeat(2,minmax(0,1fr))]` ثم `md`/`lg` كما في التصميم السابق)؛ **`ProductCard`** يدعم **`imageAspectRatio="3/4"`** للوحدة البصرية وصورة فارغة بلون الخلفية فقط على الهوم؛ قسم «أحدث المنتجات» **يُخفى فقط** إذا كانت **نفس مجموعة الـ IDs** لعيّنة «الأكثر طلباً» (وليس بسبب `latest.length <= 4` — ذلك كان يخفي الأكثر خطأً وتم إصلاحه)؛ صف التصنيفات على الجوال **تمرير أفقي** مع **تلميح تدرج** (`::after`) على طرف السطر.
+- **مسارات المنتج `/products/[slug]`:** توسيع **`buildSlugCandidates`** (`src/lib/product-slug.ts`) لمرشحات شرطة/مسافة/ترميز؛ روابط البطاقة والسلة تستخدم **`encodeURIComponent(slug)`**.
+- **حذف منتج من الإدارة:** `DELETE /api/admin/products/[id]` داخل **معاملة**: حذف `OrderItem` المرتبطة، إعادة حساب **`Order.total`** أو حذف الطلب إن لم يبقَ سطور، ثم حذف المنتج — انظر `src/app/api/admin/products/[id]/route.ts`.
+- **حذف صفحة هبوط:** واجهة **`/admin/landing`** — زر **حذف** يستدعي **`DELETE /api/admin/landing-pages/[id]`** (كان الـ API موجوداً مسبقاً؛ أضيف **`LandingPageDeleteButton`**).
+
+**ممارسات للاحتفاظ بها:**
+
+- لا تعُد ربط ظهور قسم «الأكثر طلباً» بعدد منتجات «الأحدث»؛ اعتمد **`popularProducts.length === 0`** فقط للفرع الأحادي.
+- عند تعديلات **Prisma** على Windows: إن فشل **`prisma generate`** بـ **EPERM**، أوقف **`next dev`** ثم **`npm run db:rebuild-client`**.
 
 ---
 
@@ -37,7 +56,7 @@
 
 ## حالة المشروع
 
-| الفحص | النتيجة (2026-04-21) |
+| الفحص | النتيجة (آخر مراجعة 2026-04-24) |
 |--------|------------------------|
 | TypeScript (`tsc --noEmit`) | **ناجح** |
 | ESLint (`eslint src`) | **ناجح** (مع استثناء مجلدات البناء) |
@@ -58,7 +77,7 @@
 Sell home-related products online with:
 
 - A marketing-style storefront (hero, categories, product listings, **promo filter**, cart, checkout).
-- **High-conversion campaign landings** at **`/landing/[slug]`** (RTL, glass UI: product showcase, benefits, reviews, evergreen countdown per product+page, guest order, WhatsApp, ads events) — content driven by **`LandingPage`** + **`LandingPageProduct`** rows; admin **`/admin/landing`** (list, create, per-page editor).
+- **High-conversion campaign landings** at **`/landing/[slug]`** (RTL, glass UI: product showcase, benefits, reviews, **fixed** per-slug+product countdown in `localStorage` (no auto-renew), guest order, WhatsApp, ads events) — content driven by **`LandingPage`** + **`LandingPageProduct`** rows; admin **`/admin/landing`** (list, create, edit, **delete**).
 - An **admin** area for products, categories, orders, landing copy, and image uploads.
 
 ### Current status (high level)
@@ -68,7 +87,7 @@ Sell home-related products online with:
 | Storefront browse / detail / cart / checkout | **Working** |
 | **Campaign landing** `/landing/[slug]` (multi-product slider, countdown, order, pixels) | **Working** |
 | Admin products & categories & orders + Excel export | **Working** |
-| **Admin landing manager** `/admin/landing` (pages CRUD, lines, slider settings, JSON benefits/reviews) | **Working** |
+| **Admin landing manager** `/admin/landing` (pages list/create/edit/**delete**, lines, slider settings, JSON benefits/reviews) | **Working** |
 | **Promos** (`onPromo`, optional compare-at price) | **Working** (admin + `/products?promo=1`) |
 | **Meta Pixel** (global PageView) | **Working** (root `layout.tsx` + `next/script`) |
 | **TikTok Pixel** (optional, landing layout) | **Working** when `NEXT_PUBLIC_TIKTOK_PIXEL_ID` set |
@@ -89,7 +108,7 @@ Sell home-related products online with:
 - **TikTok Pixel (landing only):** **`src/components/landing/pixel-scripts.tsx`**, included from **`src/app/(landing)/landing/layout.tsx`**, gated by **`NEXT_PUBLIC_TIKTOK_PIXEL_ID`** — avoids duplicating Meta on **`/landing/*`**.
 - **Ads helpers:** `src/lib/ads.ts` — `trackViewContent`, `AddToCart`, `InitiateCheckout`, `Purchase` (Meta) / `CompletePayment` (TikTok) for the landing client shell.
 - **Client state:** `CartProvider` (`src/contexts/cart-context.tsx`) — cart key `home1raq-cart-v1` in `localStorage`.
-- **Landing countdown:** `src/hooks/use-evergreen-countdown.ts` — per-browser **`localStorage`** key **`home1raq-landing-countdown-end:lp:{landingPageId}:{productId}`** when both are passed; duration from **`LandingPage.countdownHours`** (default 48h); resets after expiry.
+- **Landing countdown:** `src/hooks/use-evergreen-countdown.ts` — fixed-duration per browser (**no auto-renew** after zero); **`localStorage`** key **`home1raq-landing-countdown-end:slug:{landingPageSlug}:{productId}`** (slug from landing `meta.slug`); **`typeof window`** guard before storage; interval stops at expiry; UI may show **«انتهى العرض»** via `isExpired`. Duration from **`LandingPage.countdownHours`**.
 - **Motion:** `framer-motion` on hero, cards, gallery transitions (dev-only source-map noise from some deps is normal).
 
 ### Backend (same Next.js app)
@@ -100,7 +119,7 @@ Sell home-related products online with:
   - `GET|POST /api/admin/landing-pages` — list + create landing pages (Zod: slug min **2** chars, `[a-z0-9-]+`).
   - `GET|PATCH|DELETE /api/admin/landing-pages/[id]` — page core fields + **`defaultProductIndex`**, **`sliderAutoPlay`**, **`sliderAutoPlayIntervalSec`** (3–10s).
   - `POST /api/admin/landing-pages/[id]/products`, `GET|PATCH|DELETE …/products/[lppId]` — attach/reorder/update lines (**overrides**, **`displayRating`**, **`videoUrl`**, etc.).
-  - `GET|POST /api/admin/products`, `GET|PATCH|DELETE /api/admin/products/[id]` — products including **`onPromo`**, **`compareAtPrice`**, category, images.
+  - `GET|POST /api/admin/products`, `GET|PATCH|DELETE /api/admin/products/[id]` — products including **`onPromo`**, **`compareAtPrice`**, category, images; **`DELETE`** uses a **transaction**: remove **`OrderItem`** rows for that product, **recalculate `Order.total`** or **delete** orders with no lines left, then **`Product.delete`** (avoids FK **`OrderItem_productId`** blocking admin).
   - `GET|POST /api/admin/categories`, `GET|PATCH|DELETE /api/admin/categories/[id]` — categories CRUD.
   - `GET /api/admin/orders/export` — Excel export.
   - `POST /api/admin/upload` — Supabase Storage bucket **`products`** (requires **service role** key).
@@ -140,9 +159,9 @@ Sell home-related products online with:
 
 ### Storefront
 
-- **Home:** Hero, dynamic categories from DB, popular/latest blocks, **promo CTA → `/products?promo=1`**, newsletter UI.
+- **Home:** Hero, dynamic categories from DB (mobile **horizontal scroll** + end-edge **fade** hint), popular/latest blocks (**2-column mobile grid** for cards; optional **`imageAspectRatio="3/4"`** on homepage cards; hide duplicate “latest” block only when **same product ID set** as “popular” slice — see **`home-product-blocks.tsx`**), **promo CTA → `/products?promo=1`**, newsletter UI.
 - **Products:** `/products` — category, **`promo=1`**, search `q`, sort, pagination; sidebar “كل المنتجات / العروض والخصومات”.
-- **Product detail:** `/products/[slug]` — slug helpers, **`ProductImageGallery`** (main image + prev/next + dots + thumbnails + touch swipe + keyboard when focused), related products, add to cart.
+- **Product detail:** `/products/[slug]` — **`buildSlugCandidates`** (hyphen/space/encoding variants) + **`encodeURIComponent`** on storefront links to avoid `notFound` on Arabic/slug mismatches; **`ProductImageGallery`**, related products, add to cart.
 - **Promo UX:** Product cards show **“عرض”** badge when `onPromo`; optional **compare-at** strikethrough when `compareAtPrice > price`.
 - **Cart / checkout:** As before; cart line uses first product image.
 - **Layout:** `StoreHeader` (nav includes **العروض → `?promo=1`**), **`StoreFooter`** (quick links + **social links** Instagram / Facebook / TikTok, external `target="_blank"` + `rel="noopener noreferrer"`).
@@ -156,7 +175,7 @@ Sell home-related products online with:
 ### Admin
 
 - Products: multi-image upload, **Include in offers** (`onPromo`), **Compare-at price** (optional, must be **>** sale price if set), list shows **Promo** badge.
-- **Landing Page Manager (`/admin/landing`):** list pages; **New** (`/admin/landing/new`) creates a page with unique slug (client: default `offer-{timestamp}`, **min 2 chars** to match API Zod; **409** if slug taken); **Edit** per page — mode `SINGLE` \| `SLIDER`, slider options (**auto-play**, **interval 3–10s**, **default slide index**), lines (product, overrides, **`displayRating`**, images/video), JSON **benefits** / **reviews**, offer copy. Nav label in `AdminShell`: **Landing Page Manager**.
+- **Landing Page Manager (`/admin/landing`):** list pages with **Edit · Preview · Delete** (**`LandingPageDeleteButton`** → **`DELETE /api/admin/landing-pages/[id]`**); **New** (`/admin/landing/new`) creates a page with unique slug (client: default `offer-{timestamp}`, **min 2 chars** to match API Zod; **409** if slug taken); **Edit** per page — mode `SINGLE` \| `SLIDER`, slider options (**auto-play**, **interval 3–10s**, **default slide index**), lines (product, overrides, **`displayRating`**, images/video), JSON **benefits** / **reviews**, offer copy. Nav label in `AdminShell`: **Landing Page Manager**.
 - Categories, orders, export — as documented previously.
 
 ### Campaign landing (`/landing/[slug]`)
@@ -208,6 +227,7 @@ Sell home-related products online with:
 - Order line snapshots; transactions on order create.
 - **After any `schema.prisma` change:** `db push` (or migrate) + **`prisma generate`**. If generate fails with **EPERM**, stop **`next dev`**, run **`npm run db:rebuild-client`**, restart dev.
 - Admin product **PATCH/POST** catches **`PrismaClientValidationError`** and returns a hint JSON when the client is out of sync (stale `node_modules/.prisma`).
+- **Admin product `DELETE`:** must keep **orders** coherent — implementation removes **`OrderItem`** rows for that SKU, **recomputes `Order.total`**, or **deletes** the order if it has no lines left; document this to operators before they purge catalog SKUs that appear in real orders.
 
 ### React / UI
 
@@ -229,7 +249,7 @@ Sell home-related products online with:
 ### Code organization
 
 - Route groups **`(store)`**, **`(landing)`**, **`admin/(dashboard)`**, **`api/*`**.
-- Shared libs: `lib/prisma`, `lib/supabase/*`, `lib/auth/admin`, `lib/stitch-copy`, `lib/currency`, `lib/product-slug`, **`lib/landing-settings`** (types + JSON parsers), **`lib/landing-pages.ts`** ( **`getLandingPagePayload`** ), **`lib/landing-product-resolve.ts`**, **`lib/landing-defaults`**, **`lib/ads`**, etc.
+- Shared libs: `lib/prisma`, `lib/supabase/*`, `lib/auth/admin`, `lib/stitch-copy`, `lib/currency`, **`lib/product-slug`** (slug candidate expansion for PDP + links — keep in sync with any new slug rules), **`lib/landing-settings`** (types + JSON parsers), **`lib/landing-pages.ts`** ( **`getLandingPagePayload`** ), **`lib/landing-product-resolve.ts`**, **`lib/landing-defaults`**, **`lib/ads`**, etc.
 
 ### Landing admin & Client Components (best practices)
 
@@ -358,6 +378,7 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-04-24** | **Landing countdown:** fixed window, **no auto-renew**, `localStorage` key **`…:slug:{slug}:{productId}`**, SSR-safe storage, **`isExpired`** UI copy. **Home:** mobile **2-col** product grids, homepage **`ProductCard`** **`imageAspectRatio="3/4"`** + neutral empty image; **categories** mobile **horizontal scroll** + **`::after`** fade; **latest** section hidden only when **same ID multiset** as popular slice (**not** when `latest.length <= 4` — that bug was fixed). **PDP:** **`buildSlugCandidates`** (hyphen/space/encoding) + **`encodeURIComponent`** on product links. **Admin:** **`DELETE /api/admin/products/[id]`** in a **transaction** (strip **`OrderItem`**, recalc or delete **`Order`**), Arabic delete toasts; **`/admin/landing`** **Delete** button (**`LandingPageDeleteButton`**). **`PROJECT_REPORT.md`** refreshed for agents. |
 | **2026-04-21** | **Audit:** ESLint **ignores** for `.next` / `.next-dev`; fix **unused imports** in `landing-settings.ts`; **react-hooks** note in `landing-page-editor`; remove unused **`landing-showcase.tsx`**; **`LANDING_FALLBACK_PRODUCT_IMAGE`** in `landing-defaults.ts` + use in **`product-first-slider.tsx`**. |
 | **2026-04** | Product **image gallery** (slider, thumbs, swipe, a11y). |
 | **2026-04** | **Promos:** `onPromo`, `compareAtPrice`; `/products?promo=1`; admin toggles; nav + home promo CTA; cards + PDP badges/strike price. |
@@ -379,5 +400,5 @@ This report reflects **code + intentional behavior** documented here; production
 
 ## Document maintenance
 
-- Update **Changelog (section 12)** and **Last updated** when you ship meaningful features or change architecture.
-- Before claiming a capability, verify **`prisma/schema.prisma`** (`LandingPage`, `LandingPageProduct`), **`src/lib/landing-pages.ts`**, **`src/lib/landing-settings.ts`**, **`src/lib/landing-product-resolve.ts`**, **`src/components/landing/product-first-slider.tsx`**, the **`src/app/api/admin/landing-pages/`** route tree, **`src/app/layout.tsx`** (pixels), and **`src/lib/stitch-copy.ts`**.
+- Update **Changelog (section 12)** and **Last updated** when you ship meaningful features or change architecture; add a short row to the **dated Arabic “آخر تحديثات”** block (e.g. **2026-04-24**) when behaviour changes materially for Arabic storefront or admin.
+- Before claiming a capability, verify **`prisma/schema.prisma`** (`LandingPage`, `LandingPageProduct`, `Order` / `OrderItem` delete semantics), **`src/lib/landing-pages.ts`**, **`src/lib/landing-settings.ts`**, **`src/lib/landing-product-resolve.ts`**, **`src/components/landing/product-first-slider.tsx`**, **`src/hooks/use-evergreen-countdown.ts`**, **`src/components/home/home-product-blocks.tsx`**, **`src/lib/product-slug.ts`**, the **`src/app/api/admin/landing-pages/`** and **`src/app/api/admin/products/[id]/`** route handlers, **`src/app/layout.tsx`** (pixels), and **`src/lib/stitch-copy.ts`**.
