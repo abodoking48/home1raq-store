@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingPageDeleteButton } from "@/components/admin/landing-page-delete-button";
 import { prisma } from "@/lib/prisma";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -48,21 +49,28 @@ export default async function AdminLandingManager() {
                 <td className="p-3">{r.enabled ? "مفعّل" : "معطّل"}</td>
                 <td className="p-3">{r._count.products}</td>
                 <td className="p-3 text-end">
-                  <Link
-                    href={`/admin/landing/${r.id}/edit`}
-                    className="text-primary underline underline-offset-4"
-                  >
-                    تعديل
-                  </Link>
-                  {" · "}
-                  <Link
-                    href={`/landing/${r.slug}`}
-                    className="text-muted-foreground underline underline-offset-4"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    معاينة
-                  </Link>
+                  <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
+                    <Link
+                      href={`/admin/landing/${r.id}/edit`}
+                      className="text-primary underline underline-offset-4"
+                    >
+                      تعديل
+                    </Link>
+                    <span className="text-muted-foreground">·</span>
+                    <Link
+                      href={`/landing/${r.slug}`}
+                      className="text-muted-foreground underline underline-offset-4"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      معاينة
+                    </Link>
+                    <span className="text-muted-foreground">·</span>
+                    <LandingPageDeleteButton
+                      id={r.id}
+                      label={(r.title?.trim() || r.slug).slice(0, 80)}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}
