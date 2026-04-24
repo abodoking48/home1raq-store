@@ -93,15 +93,68 @@ export async function PATCH(req: Request, ctx: RouteContext) {
   }
 }
 
+function sumOrderLinesTotal(
+  lines: { priceAtOrder: Prisma.Decimal | number | unknown; quantity: number }[],
+): Prisma.Decimal {
+  const sum = lines.reduce(
+    (acc, row) => acc + Number(row.priceAtOrder) * row.quantity,
+    0,
+  );
+  return new Prisma.Decimal(sum);
+}
+
 export async function DELETE(_req: Request, ctx: RouteContext) {
   if (!(await getAdminUser())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await ctx.params;
-  try {
-    await prisma.product.delete({ where: { id } });
-  } catch {
+
+  const existing = await prisma.product.findUnique({ where: { id } });
+  if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const affectedLines = await tx.orderItem.findMany({
+        where: { productId: id },
+        select: { orderId: true },
+      });
+      const orderIds = [...new Set(affectedLines.map((row) => row.orderId))];
+
+      await tx.orderItem.deleteMany({ where: { productId: id } });
+
+      for (const orderId of orderIds) {
+        const remaining = await tx.orderItem.findMany({
+          where: { orderId },
+          select: { priceAtOrder: true, quantity: true },
+        });
+        if (remaining.length === 0) {
+          await tx.order.delete({ where: { id: orderId } });
+        } else {
+          await tx.order.update({
+            where: { id: orderId },
+            data: { total: sumOrderLinesTotal(remaining) },
+          });
+        }
+      }
+
+      await tx.product.delete({ where: { id } });
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
+      return NextResponse.json(
+        {
+          error: "FOREIGN_KEY",
+          message:
+            "تعذر الحذف بسبب ارتباط هذا المنتج ببيانات أخرى غير الطلبات. راجع صفحات الهبوط أو الإعدادات.",
+        },
+        { status: 409 },
+      );
+    }
+    console.error("[admin/products DELETE]", e);
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+
   return NextResponse.json({ ok: true });
 }

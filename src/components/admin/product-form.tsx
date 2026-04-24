@@ -119,15 +119,19 @@ export function ProductForm({ mode, productId, initial, categories }: Props) {
 
   async function remove() {
     if (!productId) return;
-    if (!confirm("Delete this product?")) return;
+    if (!confirm("حذف هذا المنتج نهائياً؟")) return;
     const res = await fetch(`/api/admin/products/${productId}`, {
       method: "DELETE",
     });
+    const data = (await res.json().catch(() => ({}))) as {
+      error?: string;
+      message?: string;
+    };
     if (!res.ok) {
-      toast.error("Delete failed");
+      toast.error(data.message ?? data.error ?? "تعذر الحذف");
       return;
     }
-    toast.success("Deleted");
+    toast.success("تم الحذف");
     router.push("/admin/products");
     router.refresh();
   }
