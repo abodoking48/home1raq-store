@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 type ReadonlyLandingOfferCountdownProps = {
   readonly settings: LandingPagePayload["settings"];
   readonly productId: string | null;
-  readonly landingPageId?: string | null;
+  readonly landingPageSlug?: string | null;
 };
 
 function pad(n: number) {
@@ -19,12 +19,12 @@ function pad(n: number) {
 export function LandingOfferCountdown({
   settings,
   productId,
-  landingPageId = null,
+  landingPageSlug = null,
 }: ReadonlyLandingOfferCountdownProps) {
-  const { segments, ready } = useEvergreenCountdown(
+  const { segments, ready, isExpired } = useEvergreenCountdown(
     settings.countdownHours,
     productId,
-    landingPageId,
+    landingPageSlug,
   );
   const { days, hours, minutes, seconds } = segments;
 
@@ -76,9 +76,7 @@ export function LandingOfferCountdown({
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">
-            العدّاد يبدأ من أول زيارة ويُحفظ على جهازك — يُعاد تلقائياً بعد انتهاء المدة.
-          </p>
+          <p className="text-xs text-muted-foreground">{isExpired ? "انتهى العرض" : "العدّاد يبدأ من أول زيارة ويُحفظ على جهازك."}</p>
         </div>
       </motion.div>
     </section>

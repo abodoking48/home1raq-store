@@ -86,7 +86,7 @@ export function LandingPageView({ initial }: ReadonlyLandingPageViewProps) {
     );
   }
 
-  const landingPageId = meta.landingPageId;
+  const landingPageSlug = meta.slug;
   const wa = whatsappDigits(settings.whatsappOverride);
 
   return (
@@ -96,7 +96,7 @@ export function LandingPageView({ initial }: ReadonlyLandingPageViewProps) {
         activeIndex={activeIndex}
         onActiveIndexChange={setActiveIndex}
         countdownHours={settings.countdownHours}
-        landingPageId={landingPageId}
+        landingPageSlug={landingPageSlug}
         sliderMode={meta.mode === "SLIDER"}
         sliderAutoPlay={settings.sliderAutoPlay}
         sliderAutoPlayIntervalSec={settings.sliderAutoPlayIntervalSec}

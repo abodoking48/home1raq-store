@@ -183,7 +183,7 @@ type ProductFirstSliderProps = {
   readonly activeIndex: number;
   readonly onActiveIndexChange: (index: number) => void;
   readonly countdownHours: number;
-  readonly landingPageId: string | null;
+  readonly landingPageSlug: string | null;
   readonly sliderMode?: boolean;
   readonly sliderAutoPlay: boolean;
   readonly sliderAutoPlayIntervalSec: number;
@@ -196,7 +196,7 @@ export function ProductFirstSlider({
   activeIndex,
   onActiveIndexChange,
   countdownHours,
-  landingPageId,
+  landingPageSlug,
   sliderMode = true,
   sliderAutoPlay,
   sliderAutoPlayIntervalSec,
@@ -598,7 +598,7 @@ export function ProductFirstSlider({
           <LandingInlineCountdown
             countdownHours={countdownHours}
             productId={product.id}
-            landingPageId={landingPageId}
+            landingPageSlug={landingPageSlug}
           />
         </div>
       </div>

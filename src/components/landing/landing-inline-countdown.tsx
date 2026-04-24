@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 type ReadonlyLandingInlineCountdownProps = {
   readonly countdownHours: number;
   readonly productId: string;
-  readonly landingPageId: string | null;
+  readonly landingPageSlug: string | null;
 };
 
 function pad(n: number) {
@@ -17,12 +17,12 @@ function pad(n: number) {
 export function LandingInlineCountdown({
   countdownHours,
   productId,
-  landingPageId,
+  landingPageSlug,
 }: ReadonlyLandingInlineCountdownProps) {
-  const { segments, ready } = useEvergreenCountdown(
+  const { segments, ready, isExpired } = useEvergreenCountdown(
     countdownHours,
     productId,
-    landingPageId,
+    landingPageSlug,
   );
   const { days, hours, minutes, seconds } = segments;
 
@@ -58,9 +58,9 @@ export function LandingInlineCountdown({
           </div>
         ))}
       </div>
-      <p className="mt-2 text-center text-[10px] text-muted-foreground md:text-[11px]">
-        يُحفظ على جهازك ويُجدد تلقائياً بعد انتهاء المدة
-      </p>
+      {isExpired ? (
+        <p className="mt-2 text-center text-[10px] text-muted-foreground md:text-[11px]">انتهى العرض</p>
+      ) : null}
     </div>
   );
 }

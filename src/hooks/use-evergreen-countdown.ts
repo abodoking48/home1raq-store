@@ -4,36 +4,38 @@ import { useEffect, useState } from "react";
 
 const STORAGE_PREFIX = "home1raq-landing-countdown-end";
 
-function storageKey(productId: string | null, landingPageId: string | null) {
-  if (landingPageId && productId) {
-    return `${STORAGE_PREFIX}:lp:${landingPageId}:${productId}`;
+function storageKey(productId: string | null, landingPageSlug: string | null) {
+  if (landingPageSlug && productId) {
+    return `${STORAGE_PREFIX}:slug:${landingPageSlug}:${productId}`;
   }
   return productId ? `${STORAGE_PREFIX}:${productId}` : `${STORAGE_PREFIX}:global`;
 }
 
-/** Per-browser evergreen countdown. Pass `landingPageId` so the same catalog product can have independent timers on different ad landings. */
+/** Fixed per-browser countdown. Stores a stable end time in localStorage by landing slug and product. */
 export function useEvergreenCountdown(
   hours: number,
   productId: string | null,
-  landingPageId: string | null = null,
+  landingPageSlug: string | null = null,
 ) {
-  const key = storageKey(productId, landingPageId);
+  const key = storageKey(productId, landingPageSlug);
   const [endMs, setEndMs] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const duration = Math.max(1, hours) * 60 * 60 * 1000;
     let stored: string | null = null;
     try {
-      stored = localStorage.getItem(key);
+      stored = window.localStorage.getItem(key);
     } catch {
       stored = null;
     }
     let end = stored ? parseInt(stored, 10) : NaN;
-    if (!Number.isFinite(end) || end <= Date.now()) {
+    if (!Number.isFinite(end)) {
       end = Date.now() + duration;
       try {
-        localStorage.setItem(key, String(end));
+        window.localStorage.setItem(key, String(end));
       } catch {
         /* private mode */
       }
@@ -43,27 +45,25 @@ export function useEvergreenCountdown(
 
   useEffect(() => {
     if (endMs == null) return;
+    if (typeof window === "undefined") return;
+
     const id = setInterval(() => {
       const t = Date.now();
-      if (t >= endMs) {
-        const duration = Math.max(1, hours) * 60 * 60 * 1000;
-        const next = t + duration;
-        try {
-          localStorage.setItem(key, String(next));
-        } catch {
-          /* noop */
-        }
-        setEndMs(next);
-      }
       setNow(t);
+
+      // Stop ticking once countdown is finished.
+      if (t >= endMs) {
+        clearInterval(id);
+      }
     }, 1000);
     return () => clearInterval(id);
-  }, [endMs, hours, key]);
+  }, [endMs]);
 
   if (endMs == null) {
     return {
       segments: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       totalMs: 0,
+      isExpired: false,
       ready: false,
     };
   }
@@ -78,6 +78,7 @@ export function useEvergreenCountdown(
   return {
     segments: { days, hours: h, minutes: m, seconds: s },
     totalMs,
+    isExpired: totalMs <= 0,
     ready: true,
   };
 }
