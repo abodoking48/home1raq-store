@@ -59,7 +59,7 @@ export default function CartPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/products/${line.slug}`}
+                    href={`/products/${encodeURIComponent(line.slug)}`}
                     className="text-lg font-bold hover:text-primary"
                   >
                     {line.name}

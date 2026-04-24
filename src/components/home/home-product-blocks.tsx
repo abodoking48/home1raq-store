@@ -17,6 +17,25 @@ type Props = {
   latestProducts: Product[];
 };
 
+/** Same catalog items (order-independent); used to hide duplicate homepage sections. */
+function sameProductsById(a: Product[], b: Product[]): boolean {
+  if (a.length !== b.length) return false;
+  const sa = [...a.map((p) => p.id)].sort();
+  const sb = [...b.map((p) => p.id)].sort();
+  return sa.every((id, i) => id === sb[i]);
+}
+
+const HOME_CARD_GRID =
+  "grid grid-cols-[repeat(2,minmax(0,1fr))] gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4";
+
+const HOME_LATEST_GRID =
+  "grid grid-cols-[repeat(2,minmax(0,1fr))] gap-4 md:grid-cols-3 md:gap-8";
+
+const cardProps = {
+  imageAspectRatio: "3/4" as const,
+  className: "min-w-0",
+};
+
 export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
   if (popularProducts.length === 0 && latestProducts.length === 0) return null;
 
@@ -41,7 +60,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
             <span className="inline-block rtl:rotate-180">←</span>
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={HOME_CARD_GRID}>
           {latestProducts.map((p) => (
             <ProductCard
               key={p.id}
@@ -53,6 +72,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               onPromo={p.onPromo}
               image={p.images[0] ?? null}
               variant="latest"
+              {...cardProps}
             />
           ))}
         </div>
@@ -62,6 +82,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
 
   const popular = popularProducts.slice(0, 4);
   const latest = latestProducts.slice(0, 4);
+  const showLatestSection = latest.length > 0 && !sameProductsById(popular, latest);
 
   return (
     <>
@@ -75,7 +96,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
           </h2>
           <p className="text-muted-foreground">{siteCopy.popular.subtitle}</p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={HOME_CARD_GRID}>
           {popular.map((p) => (
             <ProductCard
               key={p.id}
@@ -87,12 +108,13 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               onPromo={p.onPromo}
               image={p.images[0] ?? null}
               variant="popular"
+              {...cardProps}
             />
           ))}
         </div>
       </section>
 
-      {latest.length > 0 && (
+      {showLatestSection ? (
         <section className="mx-auto max-w-7xl bg-primary/[0.02] px-4 py-16 md:px-8 md:py-24">
           <div className="mb-16 flex flex-col items-end justify-between gap-4 md:flex-row">
             <div className="space-y-4 text-right">
@@ -102,9 +124,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               <h2 className="font-heading text-4xl font-black text-foreground md:text-5xl">
                 {siteCopy.latest.title}
               </h2>
-              <p className="text-muted-foreground">
-                {siteCopy.latest.subtitle}
-              </p>
+              <p className="text-muted-foreground">{siteCopy.latest.subtitle}</p>
             </div>
             <Link
               href="/products"
@@ -114,7 +134,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               <span className="inline-block rtl:rotate-180">←</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className={HOME_LATEST_GRID}>
             {latest.map((p) => (
               <ProductCard
                 key={p.id}
@@ -126,11 +146,12 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
                 onPromo={p.onPromo}
                 image={p.images[0] ?? null}
                 variant="latest"
+                {...cardProps}
               />
             ))}
           </div>
         </section>
-      )}
+      ) : null}
     </>
   );
 }

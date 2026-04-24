@@ -17,6 +17,8 @@ export type ProductCardProps = {
   className?: string;
   /** أنماط Stitch: شبكة «الأكثر طلباً» مقابل بطاقات «أحدث المنتجات» الزجاجية */
   variant?: "default" | "popular" | "latest";
+  /** Overrides variant image frame (e.g. homepage uniform grid). */
+  imageAspectRatio?: "3/4";
 };
 
 export function ProductCard({
@@ -28,9 +30,11 @@ export function ProductCard({
   image,
   className,
   variant = "default",
+  imageAspectRatio,
 }: ProductCardProps) {
   const isLatest = variant === "latest";
   const isPopular = variant === "popular";
+  const uniform34 = imageAspectRatio === "3/4";
 
   return (
     <motion.article
@@ -41,7 +45,7 @@ export function ProductCard({
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className={cn("group", className)}
     >
-      <Link href={`/products/${slug}`} className="block">
+      <Link href={`/products/${encodeURIComponent(slug)}`} className="block">
         <div
           className={cn(
             "relative overflow-hidden transition-transform duration-300 group-hover:-translate-y-1",
@@ -52,8 +56,11 @@ export function ProductCard({
         >
           <div
             className={cn(
-              "relative w-full overflow-hidden bg-[#0a0c0b]",
-              isLatest ? "mb-6 aspect-square rounded-[2rem]" : "aspect-[4/5]",
+              "relative w-full min-h-0 overflow-hidden bg-[#0a0c0b]",
+              uniform34 && "aspect-[3/4] rounded-2xl",
+              !uniform34 && isLatest && "mb-6 aspect-square rounded-[2rem]",
+              !uniform34 && !isLatest && "aspect-[4/5]",
+              uniform34 && isLatest && "mb-4",
             )}
           >
             {onPromo && (
@@ -66,13 +73,11 @@ export function ProductCard({
                 src={image}
                 alt={name}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#161817] to-[#020403] text-4xl text-muted-foreground/40">
-                —
-              </div>
+              <div className="h-full min-h-0 w-full bg-[#0a0c0b]" aria-hidden />
             )}
             {!isPopular && !isLatest && (
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
