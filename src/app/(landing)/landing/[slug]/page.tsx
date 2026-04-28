@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { LandingPageView } from "@/components/landing/landing-page-view";
 import { getLandingPagePayload } from "@/lib/landing-pages";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type PageProps = { params: Promise<{ slug: string }> };
 
