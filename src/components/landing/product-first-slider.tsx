@@ -122,8 +122,8 @@ function SlideMedia({
             fill
             sizes="(max-width:768px) 100vw, 42rem"
             className="object-cover"
-            priority={isActiveSlide && safeIdx === 0}
-            loading={isActiveSlide && safeIdx === 0 ? undefined : "lazy"}
+            priority={isActiveSlide}
+            loading={isActiveSlide ? undefined : "lazy"}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </motion.div>
