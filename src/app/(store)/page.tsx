@@ -17,7 +17,7 @@ const HomeNewsletter = dynamicImport(
   },
 );
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 export default async function HomePage() {
   let latestRows: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
