@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { formatIqdNumber } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +34,7 @@ export function ProductCard({
   const uniform34 = imageAspectRatio === "3/4";
 
   return (
-    <motion.article
-      layout
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("group", className)}
-    >
+    <article className={cn("group", className)}>
       <Link href={`/products/${encodeURIComponent(slug)}`} className="block">
         <div
           className={cn(
@@ -73,7 +63,7 @@ export function ProductCard({
                 src={image}
                 alt={name}
                 fill
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
               />
             ) : (
@@ -120,6 +110,6 @@ export function ProductCard({
           </div>
         </div>
       </Link>
-    </motion.article>
+    </article>
   );
 }

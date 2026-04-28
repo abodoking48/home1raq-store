@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ChefHat, Dumbbell, Sofa, Tv } from "lucide-react";
 import { CATEGORY_ICON_OPTIONS, type CategoryIcon } from "@/lib/category-icons";
 import { prisma } from "@/lib/prisma";
@@ -93,12 +94,15 @@ export async function HomeCategories() {
                 >
                   <div className="flex size-16 items-center justify-center rounded-2xl bg-primary/10 transition-transform group-hover:scale-110">
                     {item.iconUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={item.iconUrl}
                         alt=""
+                        width={32}
+                        height={32}
+                        sizes="32px"
                         className="size-8 object-contain"
                         loading="lazy"
+                        unoptimized
                       />
                     ) : (
                       <Icon className="size-8 text-primary" aria-hidden />

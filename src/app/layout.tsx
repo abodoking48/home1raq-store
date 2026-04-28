@@ -14,22 +14,26 @@ import { siteCopy } from "@/lib/stitch-copy";
 const fontHeading = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-heading-stack",
+  display: "swap",
 });
 
 const fontBody = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-body-stack",
+  display: "swap",
 });
 
 const fontArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-arabic-stack",
+  display: "swap",
 });
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -51,7 +55,7 @@ export default function RootLayout({
       <body
         className={`${fontHeading.variable} ${fontBody.variable} ${fontArabic.variable} ${fontMono.variable} min-h-screen font-sans`}
       >
-        <Script id="meta-pixel" strategy="afterInteractive">
+        <Script id="meta-pixel" strategy="lazyOnload">
           {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { Home, Search, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -118,9 +117,9 @@ function StoreHeaderInner() {
             className="relative p-2 text-white/70 transition-colors hover:text-foreground"
             aria-label={n.cart}
           >
-            <motion.span whileTap={{ scale: 0.92 }}>
+            <span className="transition-transform active:scale-95">
               <ShoppingCart className="size-6" />
-            </motion.span>
+            </span>
             {itemCount > 0 && (
               <Badge className="absolute end-0 top-0 min-w-5 justify-center border-0 bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                 {itemCount > 99 ? "99+" : itemCount}

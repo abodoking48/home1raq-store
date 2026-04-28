@@ -1,7 +1,7 @@
 import Link from "next/link";
+import dynamicImport from "next/dynamic";
 import { HeroSection } from "@/components/home/hero-section";
 import { HomeCategories } from "@/components/home/home-categories";
-import { HomeNewsletter } from "@/components/home/home-newsletter";
 import { HomeProductBlocks } from "@/components/home/home-product-blocks";
 import { HomePromoSection } from "@/components/home/home-promo-section";
 import { buttonVariants } from "@/components/ui/button";
@@ -9,6 +9,13 @@ import { isDatabaseUnreachableError } from "@/lib/db-unreachable";
 import { prisma } from "@/lib/prisma";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
+
+const HomeNewsletter = dynamicImport(
+  () => import("@/components/home/home-newsletter").then((mod) => mod.HomeNewsletter),
+  {
+    loading: () => <section id="community" className="mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-24" />,
+  },
+);
 
 export const dynamic = "force-dynamic";
 
