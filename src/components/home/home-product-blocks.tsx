@@ -61,7 +61,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
           </Link>
         </div>
         <div className={HOME_CARD_GRID}>
-          {latestProducts.map((p) => (
+          {latestProducts.map((p, index) => (
             <ProductCard
               key={p.id}
               id={p.id}
@@ -72,6 +72,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               onPromo={p.onPromo}
               image={p.images[0] ?? null}
               variant="latest"
+              priority={index === 0}
               {...cardProps}
             />
           ))}
@@ -97,7 +98,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
           <p className="text-muted-foreground">{siteCopy.popular.subtitle}</p>
         </div>
         <div className={HOME_CARD_GRID}>
-          {popular.map((p) => (
+          {popular.map((p, index) => (
             <ProductCard
               key={p.id}
               id={p.id}
@@ -108,6 +109,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
               onPromo={p.onPromo}
               image={p.images[0] ?? null}
               variant="popular"
+              priority={index === 0}
               {...cardProps}
             />
           ))}
@@ -135,7 +137,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
             </Link>
           </div>
           <div className={HOME_LATEST_GRID}>
-            {latest.map((p) => (
+            {latest.map((p, index) => (
               <ProductCard
                 key={p.id}
                 id={p.id}
@@ -146,6 +148,7 @@ export function HomeProductBlocks({ popularProducts, latestProducts }: Props) {
                 onPromo={p.onPromo}
                 image={p.images[0] ?? null}
                 variant="latest"
+                priority={index === 0}
                 {...cardProps}
               />
             ))}
