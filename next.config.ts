@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
   /** LAN access to dev server (phone / other PC) — add your IP if the warning shows another host. */
   allowedDevOrigins: ["192.168.68.114", "192.168.68.110"],
   images: {
+    minimumCacheTTL: 3600,
+    /** Allow `quality={80}` on `<Image>`; default whitelist is [75]. */
+    qualities: [75, 80],
     remotePatterns: [
       /** Supabase Storage public URLs (`*.supabase.co`) — does not depend on env at build. */
       {

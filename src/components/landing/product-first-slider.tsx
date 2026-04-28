@@ -120,10 +120,11 @@ function SlideMedia({
             src={src}
             alt={product.name}
             fill
-            sizes="(max-width:768px) 100vw, 42rem"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            quality={80}
             className="object-cover"
-            priority={isActiveSlide}
-            loading={isActiveSlide ? undefined : "lazy"}
+            priority={isActiveSlide && safeIdx === 0}
+            loading={isActiveSlide && safeIdx === 0 ? undefined : "lazy"}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </motion.div>
@@ -418,10 +419,10 @@ export function ProductFirstSlider({
 
       <div
         ref={heroRef}
-        className="glass-panel mx-auto max-w-lg overflow-hidden rounded-3xl ring-1 ring-white/10 md:max-w-2xl"
+        className="glass-panel mx-auto flex max-w-lg flex-col overflow-hidden rounded-3xl ring-1 ring-white/10 md:max-w-2xl"
       >
         <div
-          className="relative"
+          className="relative order-3 md:order-none"
           onPointerEnter={() => multi && setHoverPause(true)}
           onPointerLeave={() => multi && setHoverPause(false)}
           onTouchStart={multi ? onTouchStart : undefined}
@@ -505,7 +506,7 @@ export function ProductFirstSlider({
         </div>
 
         {multi ? (
-          <div className="border-b border-white/5 px-3 pb-2 pt-3">
+          <div className="order-4 border-b border-white/5 px-3 pb-2 pt-3 md:order-none">
             <p className="mb-2 text-center text-xs leading-relaxed text-muted-foreground">
               <span className="inline-block rounded-full bg-white/5 px-2 py-0.5">
                 يوجد أكثر من منتج 👇
@@ -558,7 +559,7 @@ export function ProductFirstSlider({
           </div>
         ) : null}
 
-        <div className="space-y-4 p-5 md:p-8">
+        <div className="order-1 space-y-4 p-5 md:order-none md:p-8">
           <div>
             <h1 className="font-heading text-2xl font-bold leading-tight md:text-3xl">
               {product.name}

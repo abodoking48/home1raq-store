@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { LandingPageSkeleton } from "@/components/landing/landing-page-skeleton";
 import { LandingPageView } from "@/components/landing/landing-page-view";
 import { getLandingPagePayload } from "@/lib/landing-pages";
 
@@ -19,9 +21,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function LandingBySlug({ params }: PageProps) {
+async function LandingBySlugContent({ params }: PageProps) {
   const { slug } = await params;
   const initial = await getLandingPagePayload(slug);
   if (!initial) notFound();
   return <LandingPageView initial={initial} />;
+}
+
+export default function LandingBySlug(props: PageProps) {
+  return (
+    <Suspense fallback={<LandingPageSkeleton />}>
+      <LandingBySlugContent {...props} />
+    </Suspense>
+  );
 }
