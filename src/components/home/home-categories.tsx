@@ -53,7 +53,11 @@ export async function HomeCategories() {
         }));
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-24">
+    <section
+      id="home-categories"
+      data-visible="false"
+      className="home-categories-reveal mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-24"
+    >
       <div className="mb-12 flex items-center justify-between gap-4">
         <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">
           {title}

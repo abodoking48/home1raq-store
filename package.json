@@ -10,7 +10,7 @@
     "clean": "node scripts/clean-next.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "db:generate": "prisma generate",
     "db:rebuild-client": "node scripts/rebuild-prisma-client.mjs",
     "db:migrate": "prisma migrate dev",

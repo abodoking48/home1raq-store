@@ -2,11 +2,35 @@
 
 **Document purpose:** Living technical reference for the `home1raq-store` codebase — use it to recall **architecture**, **decisions**, **what shipped**, and **how to operate** the project.
 
-**Last updated:** 2026-04-24 (homepage grids + slug matching, landing countdown semantics, admin delete UX, product delete vs orders, report refresh).
+**Last updated:** 2026-04-29 (performance pass: landing cache/ISR, Next.js 16 patterns, middleware scope, image config, mobile header search, homepage scroll UX cues; agent documentation in this report).
 
 > **Status:** The project is **still under development**; core storefront + admin + orders + **campaign landing pages** (per-slug, optional multi-product slider) are usable; newsletter, payments, and hardening remain partial.
 
-> **Agent checkpoint:** Use **Section 12 (Changelog)** and the **“آخر تحديثات — 2026-04-24”** block as the canonical “where we left off”. After meaningful work, append **one changelog row**, bump **Last updated**, and align any **Architecture** bullets with `schema.prisma` + the files cited here.
+> **Agent checkpoint:** Use **Section 12 (Changelog)** and the **“آخر تحديثات — 2026-04-29”** block as the canonical “where we left off”. After meaningful work, append **one changelog row**, bump **Last updated**, and align any **Architecture** bullets with `schema.prisma` + the files cited here. **Cursor / coding agents:** this file is the handoff surface — read the dated Arabic blocks + Changelog before changing store, landing, or infra paths.
+
+---
+
+## آخر تحديثات — 2026-04-29
+
+**سياق:** جُرِّب جزء كبير من التحسينات والإصلاحات أثناء جلسات تطوير بمساعدة **وكيل Cursor (Agent)**؛ هذا القسم يخلّص ما يهمّ أي مطوّر أو Agent لاحقاً.
+
+**سلوك وكود (أداء + Next.js 16 + استقرار التطوير):**
+
+- **صفحات الهبوط `/landing/[slug]`:** `export const revalidate = 60` في `src/app/(landing)/landing/[slug]/page.tsx`؛ **`getLandingPagePayload`** ملفّاً بـ **`unstable_cache`** في `src/lib/landing-pages.ts` (مفتاح `["landing-page-payload"]`، `{ revalidate: 60, tags: ["landing-pages"] }`) لتقليل ضغط Prisma وتكرار الاستعلام؛ **`Suspense`** مع **`LandingPageSkeleton`** كـ fallback أثناء التحميل.
+- **الصور:** في `next.config.ts` — `images.qualities: [75, 80]` حتى لا يظهر تحذير Next عند **`quality={80}`** على `<Image>`؛ مع `minimumCacheTTL` و`formats` (AVIF/WebP) و`remotePatterns` لـ Supabase/Unsplash كما هو موثّق.
+- **Middleware:** `config.matcher` مقصور على **`/admin/:path*`** (`src/middleware.ts`) حتى لا يُنفَّذ منطق Supabase cookies على كل طلب عام — يقلّل التكلفة على الصفحة الرئيسية والمتجر.
+- **Next.js 16 / Server Components:** تجنّب **`next/dynamic` مع `{ ssr: false }`** داخل مكوّنات سيرفر؛ إن لزم تحميل عميل فقط، استورد المكوّن العميلي مباشرة أو افصل الحدود. تجنّب تسمية **`dynamic`** كاسم يتصادم مع **`export const dynamic`** (استخدم alias مثل `dynamicImport` أو استيراداً ثابتاً حيث يناسب).
+- **الواجهة — الهيدر:** البحث يظهر على **الجوال** أيضاً مع عرض محدود (`src/components/layout/store-header.tsx`؛ commit **`682cd4d`** على `main`).
+- **تحسينات أداء عامة (جلسة الوكيل):** ضبط **`next/font`** (`display: "swap"`)، تخفيف حمل السكربتات الثالثة حيث يناسب، تحسين **`next/image`** على الهوم/البطاقات/الهبوط (`priority` / `sizes` / `quality` حيث منطقي)، وترتيب محتوى الهيرو في الهبوط بعد مراجعة LCP (الصورة أمام التفاصيل حيث يقرّر الفريق).
+- **الصفحة الرئيسية — UX للتمرير:** الهيرو مضبوط على **`85vh`** لإظهار لمحة من القسم التالي، مع مؤشر نزول متحرك **«اكتشف المزيد ↓»** بلون الثيم الأخضر يختفي تلقائياً بعد التمرير، والضغط عليه يعمل **smooth scroll** إلى قسم التصنيفات، مع **fade-up** خفيف عند دخول التصنيفات إلى إطار العرض.
+- **تطوير محلي:** إن ظهرت **404** غير متوقعة على `/landing/...` أو تعارض Turbopack — غالباً **cache `.next`** أو **أكثر من عملية `next dev`** على نفس المنفذ؛ أوقف العمليات الزائدة، **`npm run clean`**, ثم **`next dev`** واحد. بعد تغييرات Prisma على Windows و**EPERM**: أوقف **`next dev`** ثم **`npm run db:rebuild-client`** (كما في 2026-04-24).
+
+**ممارسات نحتفظ بها (للـ Agent والبشر):**
+
+- أي **`quality`** على `<Image>` غير الافتراضي يجب أن يكون مدرجاً في **`images.qualities`** في `next.config.ts`.
+- توسيع نطاق **middleware** فقط عند الحاجة الأمنية؛ المطابقة الواسعة تكلف كل طلباً.
+- بيانات الهبوط الثقيلة: **`unstable_cache` + `revalidate`/`tags`** على الدوال المشتركة بين الصفحة والـ metadata/API حيث ينطبق.
+- بعد جلسة Agent: راجع **`git diff`**, **`npm run lint`**, ومسار **`/landing/[slug]`** و**`/admin`** يدوياً أو عبر المتصفح قبل الدمج.
 
 ---
 
@@ -56,7 +80,7 @@
 
 ## حالة المشروع
 
-| الفحص | النتيجة (آخر مراجعة 2026-04-24) |
+| الفحص | النتيجة (آخر مراجعة 2026-04-29) |
 |--------|------------------------|
 | TypeScript (`tsc --noEmit`) | **ناجح** |
 | ESLint (`eslint src`) | **ناجح** (مع استثناء مجلدات البناء) |
@@ -70,7 +94,7 @@
 
 ### Short description
 
-**home1raq-store** is an Arabic (**RTL**) e-commerce storefront built with **Next.js 15** (App Router), backed by **PostgreSQL** via **Prisma**, with **Supabase** for **admin authentication** and **object storage (product images)**. The public shop is **guest-only** (no customer login); the cart lives in **localStorage**.
+**home1raq-store** is an Arabic (**RTL**) e-commerce storefront built with **Next.js 16** (App Router), backed by **PostgreSQL** via **Prisma**, with **Supabase** for **admin authentication** and **object storage (product images)**. The public shop is **guest-only** (no customer login); the cart lives in **localStorage**.
 
 ### Purpose
 
@@ -100,7 +124,7 @@ Sell home-related products online with:
 
 ### Frontend
 
-- **Next.js 15** App Router (`src/app/`).
+- **Next.js 16** App Router (`src/app/`).
 - **React 19**, **Tailwind CSS v4**, **shadcn-style UI** + **Base UI** primitives (`src/components/ui/`).
 - **RTL** root layout (`lang="ar"`, `dir="rtl"`); admin dashboard shell uses **LTR** for the dashboard UI.
 - **Route groups:** `(store)` — catalog storefront; `(landing)` — **`/landing/**`** (minimal chrome: fixed header + links; no `StoreHeader` / `StoreFooter`); **`admin`** — dashboard.
@@ -237,7 +261,12 @@ Sell home-related products online with:
 ### Performance & dev experience
 
 - **`sizes`** on `next/image` with `fill`.
+- **Image `quality`:** If you use non-default **`quality`** (e.g. `80`), add it to **`images.qualities`** in **`next.config.ts`** — Next 16 warns otherwise.
+- **Landing payload:** Prefer **`unstable_cache`** on shared DB loaders such as **`getLandingPagePayload`** with **`revalidate`** aligned to the route’s **`export const revalidate`**; use **`tags`** when you add cache invalidation from admin mutations.
+- **Middleware scope:** Keep **`matcher`** as narrow as security allows (currently **`/admin/:path*`** only) so public routes do not pay Supabase session refresh on every request.
+- **Next.js 16 + Server Components:** Do not combine **`next/dynamic`** with **`{ ssr: false }`** in Server Component files; avoid naming collisions between **`dynamic()`** and **`export const dynamic`**. Prefer static imports of client components at the RSC boundary when possible.
 - **Stale webpack chunks** (`Cannot find module './NNN.js'`): stop dev, **`npm run clean`**, delete locked **`.next-dev`** if needed, restart — often cache corruption, not app logic.
+- **Single `next dev`:** Multiple dev servers on the same port/project folder can cause confusing 404s and corrupt incremental state — kill stray PIDs before debugging “mystery” route failures.
 
 ### Analytics pixels (Meta + TikTok)
 
@@ -378,6 +407,9 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-04-29** | **Homepage hero spacing fix:** removed excessive top empty space by tightening hero top layout padding/alignment; moved **«اكتشف المزيد ↓»** to an absolute bottom position inside the 85vh hero so it is visible on first load (mobile included). |
+| **2026-04-29** | **Homepage scroll UX:** hero height 85vh, animated scroll indicator (bounce + Arabic label, auto-hide on scroll), smooth-scroll to categories, fade-up entrance on categories section. |
+| **2026-04-29** | **Performance / Next 16:** Landing **`revalidate = 60`** + **`unstable_cache`** on **`getLandingPagePayload`** (`landing-pages.ts`) with tags; **`Suspense`** + **`LandingPageSkeleton`** on **`/landing/[slug]`**. **`next.config`:** **`images.qualities`** `[75, 80]`, image cache TTL + AVIF/WebP. **Middleware** matcher narrowed to **`/admin/:path*`**. **Store header:** search visible on mobile with constrained width (**`682cd4d`**). **Patterns:** no **`dynamic(..., { ssr: false })`** in RSC files; font **`display: "swap"`**; lighter third-party script loading where applied. **Dev:** document single **`next dev`**, clean `.next` when Turbopack/404 issues. **`PROJECT_REPORT.md`:** new **2026-04-29** Arabic block + Changelog + best-practices for **Cursor Agent** handoff. |
 | **2026-04-24** | **Landing countdown:** fixed window, **no auto-renew**, `localStorage` key **`…:slug:{slug}:{productId}`**, SSR-safe storage, **`isExpired`** UI copy. **Home:** mobile **2-col** product grids, homepage **`ProductCard`** **`imageAspectRatio="3/4"`** + neutral empty image; **categories** mobile **horizontal scroll** + **`::after`** fade; **latest** section hidden only when **same ID multiset** as popular slice (**not** when `latest.length <= 4` — that bug was fixed). **PDP:** **`buildSlugCandidates`** (hyphen/space/encoding) + **`encodeURIComponent`** on product links. **Admin:** **`DELETE /api/admin/products/[id]`** in a **transaction** (strip **`OrderItem`**, recalc or delete **`Order`**), Arabic delete toasts; **`/admin/landing`** **Delete** button (**`LandingPageDeleteButton`**). **`PROJECT_REPORT.md`** refreshed for agents. |
 | **2026-04-21** | **Audit:** ESLint **ignores** for `.next` / `.next-dev`; fix **unused imports** in `landing-settings.ts`; **react-hooks** note in `landing-page-editor`; remove unused **`landing-showcase.tsx`**; **`LANDING_FALLBACK_PRODUCT_IMAGE`** in `landing-defaults.ts` + use in **`product-first-slider.tsx`**. |
 | **2026-04** | Product **image gallery** (slider, thumbs, swipe, a11y). |
@@ -400,5 +432,5 @@ This report reflects **code + intentional behavior** documented here; production
 
 ## Document maintenance
 
-- Update **Changelog (section 12)** and **Last updated** when you ship meaningful features or change architecture; add a short row to the **dated Arabic “آخر تحديثات”** block (e.g. **2026-04-24**) when behaviour changes materially for Arabic storefront or admin.
+- Update **Changelog (section 12)** and **Last updated** when you ship meaningful features or change architecture; add a short row to the **dated Arabic “آخر تحديثات”** block (e.g. **2026-04-29**) when behaviour changes materially for Arabic storefront or admin.
 - Before claiming a capability, verify **`prisma/schema.prisma`** (`LandingPage`, `LandingPageProduct`, `Order` / `OrderItem` delete semantics), **`src/lib/landing-pages.ts`**, **`src/lib/landing-settings.ts`**, **`src/lib/landing-product-resolve.ts`**, **`src/components/landing/product-first-slider.tsx`**, **`src/hooks/use-evergreen-countdown.ts`**, **`src/components/home/home-product-blocks.tsx`**, **`src/lib/product-slug.ts`**, the **`src/app/api/admin/landing-pages/`** and **`src/app/api/admin/products/[id]/`** route handlers, **`src/app/layout.tsx`** (pixels), and **`src/lib/stitch-copy.ts`**.

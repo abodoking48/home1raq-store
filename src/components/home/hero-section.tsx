@@ -1,18 +1,37 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowLeft, Sparkles } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
 
 export function HeroSection() {
   const h = siteCopy.hero;
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowScrollIndicator(window.scrollY < 200);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToCategories = () => {
+    const categoriesSection = document.getElementById("home-categories");
+    categoriesSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
-    <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden px-4 pb-16 pt-28 md:px-6">
+    <section className="relative flex h-[85vh] items-start justify-center overflow-hidden px-4 pb-16 pt-4 md:px-6 md:pt-6">
       <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.12)_0%,rgba(2,4,3,0)_70%)]" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.1)_0%,rgba(2,4,3,0)_70%)]" />
 
-      <div className="relative z-10 mx-auto max-w-5xl space-y-8 text-center md:space-y-10">
+      <div className="relative z-10 mx-auto max-w-5xl space-y-8 pt-4 text-center md:space-y-10 md:pt-6">
         <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-5 py-2 text-sm font-medium text-primary">
           <Sparkles className="size-4 shrink-0" aria-hidden />
           {h.badge}
@@ -50,12 +69,21 @@ export function HeroSection() {
           </Link>
         </div>
 
-        <div className="flex justify-center pt-12">
-          <div className="flex h-12 w-8 justify-center rounded-full border-2 border-white/20 p-2">
-            <span className="size-1.5 animate-bounce rounded-full bg-primary" />
-          </div>
-        </div>
       </div>
+      <button
+        type="button"
+        onClick={scrollToCategories}
+        aria-label="اكتشف المزيد"
+        className={cn(
+          "absolute bottom-4 left-1/2 z-20 flex w-fit -translate-x-1/2 flex-col items-center gap-1 text-primary transition-all duration-300",
+          showScrollIndicator
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-2 opacity-0",
+        )}
+      >
+        <span className="text-sm font-semibold">اكتشف المزيد ↓</span>
+        <ArrowDown className="hero-scroll-indicator size-5" aria-hidden />
+      </button>
     </section>
   );
 }

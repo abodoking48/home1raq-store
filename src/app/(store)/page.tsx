@@ -2,6 +2,7 @@ import Link from "next/link";
 import dynamicImport from "next/dynamic";
 import { HeroSection } from "@/components/home/hero-section";
 import { HomeCategories } from "@/components/home/home-categories";
+import { HomeCategoriesReveal } from "@/components/home/home-categories-reveal";
 import { HomeProductBlocks } from "@/components/home/home-product-blocks";
 import { HomePromoSection } from "@/components/home/home-promo-section";
 import { buttonVariants } from "@/components/ui/button";
@@ -105,6 +106,7 @@ export default async function HomePage() {
         </div>
       ) : null}
       <HeroSection />
+      <HomeCategoriesReveal />
       <HomeCategories />
 
       {latestProducts.length === 0 ? (

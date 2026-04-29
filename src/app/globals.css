@@ -130,6 +130,7 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
 }
 
@@ -147,9 +148,46 @@
   }
 }
 
+@keyframes hero-scroll-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@keyframes section-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer utilities {
   .landing-cta-pulse {
     animation: landing-cta-pulse 2.8s ease-in-out infinite;
+  }
+
+  .hero-scroll-indicator {
+    animation: hero-scroll-bounce 1.6s ease-in-out infinite;
+  }
+
+  .home-categories-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  }
+
+  .home-categories-reveal[data-visible="true"] {
+    animation: section-fade-up 0.55s ease-out forwards;
   }
 
   .glass-panel {
