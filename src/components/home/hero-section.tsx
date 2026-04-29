@@ -27,7 +27,13 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative flex h-[85vh] items-start justify-center overflow-hidden px-4 pb-16 pt-4 md:px-6 md:pt-6">
+    <section
+      className="relative flex h-[85vh] items-start justify-center overflow-hidden px-4 pt-4 md:px-6 md:pt-6"
+      style={{
+        height: "85svh",
+        paddingBottom: "calc(4rem + env(safe-area-inset-bottom))",
+      }}
+    >
       <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.12)_0%,rgba(2,4,3,0)_70%)]" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.1)_0%,rgba(2,4,3,0)_70%)]" />
 
