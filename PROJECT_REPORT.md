@@ -407,6 +407,8 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-04-29** | **Homepage hero refactor:** **`HeroSection`** uses **`flex-col` + `justify-center` + `minHeight: 85svh`**, a **`flex-1`** spacer before the scroll row, **no `absolute`** on **«اكتشف المزيد ↓»**; **`animate-bounce`** on chevron; removed **`.hero-section-height-stack`** from **`globals.css`**. |
+| **2026-04-29** | **Homepage hero layout tweak:** hero `<section>` uses **`.hero-section-height-stack`** (`85vh` → `85dvh` → `85svh`); removed extra section **`paddingBottom`**; inner content **`pb-16`**; scroll indicator **`bottom-8`** (was **`bottom-4`**). |
 | **2026-04-29** | **iOS Safari viewport fix (hero):** switched hero height to **`85svh`** with **`85vh`** fallback and added bottom safe-area padding via **`env(safe-area-inset-bottom)`** so **«اكتشف المزيد ↓»** remains visible above browser/home UI on real iPhones. |
 | **2026-04-29** | **Homepage hero spacing fix:** removed excessive top empty space by tightening hero top layout padding/alignment; moved **«اكتشف المزيد ↓»** to an absolute bottom position inside the 85vh hero so it is visible on first load (mobile included). |
 | **2026-04-29** | **Homepage scroll UX:** hero height 85vh, animated scroll indicator (bounce + Arabic label, auto-hide on scroll), smooth-scroll to categories, fade-up entrance on categories section. |

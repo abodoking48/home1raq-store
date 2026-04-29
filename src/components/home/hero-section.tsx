@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowLeft, Sparkles } from "lucide-react";
@@ -15,7 +14,6 @@ export function HeroSection() {
     const onScroll = () => {
       setShowScrollIndicator(window.scrollY < 200);
     };
-
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -28,31 +26,25 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative flex h-[85vh] items-start justify-center overflow-hidden px-4 pt-4 md:px-6 md:pt-6"
-      style={{
-        height: "85svh",
-        paddingBottom: "calc(4rem + env(safe-area-inset-bottom))",
-      }}
+      className="relative flex flex-col items-center justify-center overflow-hidden px-4 pt-4 md:px-6 md:pt-6"
+      style={{ minHeight: "85svh" }}
     >
       <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.12)_0%,rgba(2,4,3,0)_70%)]" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.1)_0%,rgba(2,4,3,0)_70%)]" />
 
-      <div className="relative z-10 mx-auto max-w-5xl space-y-8 pt-4 text-center md:space-y-10 md:pt-6">
+      <div className="relative z-10 mx-auto max-w-5xl space-y-8 py-4 text-center md:space-y-10 md:py-6">
         <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-5 py-2 text-sm font-medium text-primary">
           <Sparkles className="size-4 shrink-0" aria-hidden />
           {h.badge}
         </div>
-
         <h1 className="font-heading text-5xl font-black leading-[1.1] tracking-tight text-foreground md:text-7xl lg:text-8xl">
           {h.titleBefore}
           <br />
           <span className="text-primary">{h.titleBrand}</span>
         </h1>
-
         <p className="mx-auto max-w-3xl text-lg font-light leading-relaxed text-muted-foreground md:text-2xl">
           {h.subtitle}
         </p>
-
         <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row sm:gap-6">
           <Link
             href="/products"
@@ -74,21 +66,24 @@ export function HeroSection() {
             {h.ctaSecondary}
           </Link>
         </div>
-
       </div>
+
+      {/* Spacer pushes indicator to bottom */}
+      <div className="flex-1" />
+
       <button
         type="button"
         onClick={scrollToCategories}
         aria-label="اكتشف المزيد"
         className={cn(
-          "absolute bottom-4 left-1/2 z-20 flex w-fit -translate-x-1/2 flex-col items-center gap-1 text-primary transition-all duration-300",
+          "z-20 mb-6 flex w-fit flex-col items-center gap-1 text-primary transition-all duration-300",
           showScrollIndicator
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-2 opacity-0",
         )}
       >
         <span className="text-sm font-semibold">اكتشف المزيد ↓</span>
-        <ArrowDown className="hero-scroll-indicator size-5" aria-hidden />
+        <ArrowDown className="size-5 animate-bounce" aria-hidden />
       </button>
     </section>
   );
