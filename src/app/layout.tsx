@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from '@vercel/analytics/next';
 import {
   Geist_Mono,
   IBM_Plex_Sans_Arabic,
@@ -85,6 +86,7 @@ fbq('track', 'PageView');`}
           {children}
           <Toaster />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );

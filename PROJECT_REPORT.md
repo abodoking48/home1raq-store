@@ -407,6 +407,11 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-05-07** | Added Vercel Analytics integration: installed `@vercel/analytics`, imported `Analytics` in `src/app/layout.tsx`, and rendered `<Analytics />` inside root `<body>`. |
+| **2026-05-07** | Rollback: reverted the recent Supabase image transform/thumbnails changes after they caused product image rendering issues in `next/image`. |
+| **2026-05-07** | Fix: Allow `next/image` to load Supabase transformed images by adding `images.remotePatterns` support for `/storage/v1/render/image/public/**` in `next.config.ts`. |
+| **2026-05-07** | Fix: Supabase thumbnail transforms now rewrite `storage/v1/object/public` URLs to the correct `storage/v1/render/image/public` endpoint before appending `width/quality`, preventing Next.js upstream image timeouts. |
+| **2026-05-07** | Optimized small product thumbnails by adding accurate `sizes` hints and Supabase image transforms (`?width=…&quality=75`) for fixed-size `next/image` usages (e.g. admin products list 48px, landing thumbs 40/64px, product gallery thumbs, cart item image), reducing overfetch without changing UI layout. |
 | **2026-05-07** | Added `export const revalidate = 3600;` to `src/app/(store)/products/page.tsx` and `src/app/(store)/products/[slug]/page.tsx` to set 1-hour route revalidation on products listing and product detail pages. |
 | **2026-05-07** | Product detail page (`/products/[slug]`) now shows a green free-delivery line under price and before description: **"🚚 توصيل مجاني لجميع أنحاء العراق"** (styled to match the promo badge tone). |
 | **2026-05-07** | Cart/checkout summaries now remove shipping-cost rows and show **"توصيل مجاني 🚚"** in green next to total while keeping total math unchanged; landing product section adds a marketing badge under price: **"🚚 توصيل مجاني لجميع أنحاء العراق"**. |
