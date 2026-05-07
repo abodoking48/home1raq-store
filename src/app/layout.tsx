@@ -85,8 +85,8 @@ fbq('track', 'PageView');`}
         <CartProvider>
           {children}
           <Toaster />
+          <Analytics />
         </CartProvider>
-        <Analytics />
       </body>
     </html>
   );
