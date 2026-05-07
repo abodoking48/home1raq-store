@@ -407,6 +407,7 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-05-07** | Added Facebook domain verification meta (`verification.other["facebook-domain-verification"]`) to root `metadata` in `src/app/layout.tsx`. |
 | **2026-04-29** | **Homepage hero refactor:** **`HeroSection`** uses **`flex-col` + `justify-center` + `minHeight: 85svh`**, a **`flex-1`** spacer before the scroll row, **no `absolute`** on **«اكتشف المزيد ↓»**; **`animate-bounce`** on chevron; removed **`.hero-section-height-stack`** from **`globals.css`**. |
 | **2026-04-29** | **Homepage hero layout tweak:** hero `<section>` uses **`.hero-section-height-stack`** (`85vh` → `85dvh` → `85svh`); removed extra section **`paddingBottom`**; inner content **`pb-16`**; scroll indicator **`bottom-8`** (was **`bottom-4`**). |
 | **2026-04-29** | **iOS Safari viewport fix (hero):** switched hero height to **`85svh`** with **`85vh`** fallback and added bottom safe-area padding via **`env(safe-area-inset-bottom)`** so **«اكتشف المزيد ↓»** remains visible above browser/home UI on real iPhones. |

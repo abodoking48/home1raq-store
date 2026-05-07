@@ -39,6 +39,11 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   title: siteCopy.meta.title,
   description: siteCopy.meta.description,
+  verification: {
+    other: {
+      "facebook-domain-verification": "lpt8k7rre4fag1n4kn0z4tigeibhif",
+    },
+  },
 };
 
 /** Meta Pixel — override with NEXT_PUBLIC_META_PIXEL_ID in .env.local */
