@@ -588,6 +588,9 @@ export function ProductFirstSlider({
               <RatingRow rating={product.displayRating} />
             ) : null}
           </div>
+          <p className="inline-flex w-fit items-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-sm font-semibold text-emerald-300 md:text-base">
+            🚚 توصيل مجاني لجميع أنحاء العراق
+          </p>
 
           {onPrimaryCtaClick ? (
             <LandingPrimaryCtaButton

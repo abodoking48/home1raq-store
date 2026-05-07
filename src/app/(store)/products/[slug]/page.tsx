@@ -99,6 +99,9 @@ export default async function ProductDetailPage({ params }: Props) {
                 دينار عراقي
               </p>
             </div>
+            <p className="mt-3 inline-flex w-fit items-center rounded-full bg-primary/20 px-3 py-1 text-sm font-bold text-primary ring-1 ring-primary/30 md:text-base">
+              🚚 توصيل مجاني لجميع أنحاء العراق
+            </p>
           </div>
 
           <div className="space-y-4 text-base leading-relaxed text-muted-foreground">

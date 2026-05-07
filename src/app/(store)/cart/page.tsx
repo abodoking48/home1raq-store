@@ -130,15 +130,16 @@ export default function CartPage() {
             </ul>
             <div className="mt-6 border-t border-white/10 pt-4">
               <div className="mb-2 flex justify-between text-sm text-muted-foreground">
-                <span>رسوم التوصيل</span>
-                <span>تحسب عند التأكيد</span>
-              </div>
-              <div className="mb-2 flex justify-between text-sm text-muted-foreground">
                 <span>خصم الأعضاء</span>
                 <span>—</span>
               </div>
               <div className="flex justify-between font-heading text-xl text-primary">
-                <span>الإجمالي</span>
+                <span className="flex items-center gap-2">
+                  <span>الإجمالي</span>
+                  <span className="text-sm font-semibold text-emerald-400">
+                    توصيل مجاني 🚚
+                  </span>
+                </span>
                 <span>{formatIqd(subtotal)}</span>
               </div>
               <p className="mt-1 text-[10px] text-muted-foreground">{c.vatNote}</p>

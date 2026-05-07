@@ -407,6 +407,8 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-05-07** | Product detail page (`/products/[slug]`) now shows a green free-delivery line under price and before description: **"🚚 توصيل مجاني لجميع أنحاء العراق"** (styled to match the promo badge tone). |
+| **2026-05-07** | Cart/checkout summaries now remove shipping-cost rows and show **"توصيل مجاني 🚚"** in green next to total while keeping total math unchanged; landing product section adds a marketing badge under price: **"🚚 توصيل مجاني لجميع أنحاء العراق"**. |
 | **2026-05-07** | Added Facebook domain verification meta (`verification.other["facebook-domain-verification"]`) to root `metadata` in `src/app/layout.tsx`. |
 | **2026-04-29** | **Homepage hero refactor:** **`HeroSection`** uses **`flex-col` + `justify-center` + `minHeight: 85svh`**, a **`flex-1`** spacer before the scroll row, **no `absolute`** on **«اكتشف المزيد ↓»**; **`animate-bounce`** on chevron; removed **`.hero-section-height-stack`** from **`globals.css`**. |
 | **2026-04-29** | **Homepage hero layout tweak:** hero `<section>` uses **`.hero-section-height-stack`** (`85vh` → `85dvh` → `85svh`); removed extra section **`paddingBottom`**; inner content **`pb-16`**; scroll indicator **`bottom-8`** (was **`bottom-4`**). |
