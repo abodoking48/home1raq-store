@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { formatIqdNumber } from "@/lib/currency";
 import { siteCopy } from "@/lib/stitch-copy";
 
+export const revalidate = 3600;
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };

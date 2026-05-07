@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { prisma } from "@/lib/prisma";
 import { siteCopy } from "@/lib/stitch-copy";
 
+export const revalidate = 3600;
 export const dynamic = "force-dynamic";
 
 type Props = {

@@ -407,6 +407,7 @@ This report reflects **code + intentional behavior** documented here; production
 
 | When (approx) | What changed |
 |----------------|--------------|
+| **2026-05-07** | Added `export const revalidate = 3600;` to `src/app/(store)/products/page.tsx` and `src/app/(store)/products/[slug]/page.tsx` to set 1-hour route revalidation on products listing and product detail pages. |
 | **2026-05-07** | Product detail page (`/products/[slug]`) now shows a green free-delivery line under price and before description: **"🚚 توصيل مجاني لجميع أنحاء العراق"** (styled to match the promo badge tone). |
 | **2026-05-07** | Cart/checkout summaries now remove shipping-cost rows and show **"توصيل مجاني 🚚"** in green next to total while keeping total math unchanged; landing product section adds a marketing badge under price: **"🚚 توصيل مجاني لجميع أنحاء العراق"**. |
 | **2026-05-07** | Added Facebook domain verification meta (`verification.other["facebook-domain-verification"]`) to root `metadata` in `src/app/layout.tsx`. |
