@@ -137,3 +137,43 @@ enum OrderStatus {
   CONFIRMED
   CANCELLED
 }
+
+/// Photo received by the Telegram product bot. Album photos arrive as separate
+/// updates sharing `mediaGroupId`; they are joined when the captioned one arrives.
+model TelegramPhoto {
+  id           String   @id @default(cuid())
+  chatId       String
+  messageId    Int
+  mediaGroupId String?
+  fileId       String
+  createdAt    DateTime @default(now())
+
+  @@unique([chatId, messageId])
+  @@index([chatId, mediaGroupId])
+}
+
+/// Product draft awaiting ✅ نشر / ❌ إلغاء in Telegram.
+model TelegramDraft {
+  id              String              @id @default(cuid())
+  chatId          String
+  sourceMessageId Int
+  name            String
+  description     String              @db.Text
+  price           Decimal             @db.Decimal(12, 2)
+  compareAtPrice  Decimal?            @db.Decimal(12, 2)
+  categoryId      String?
+  fileIds         String[]
+  status          TelegramDraftStatus @default(PENDING)
+  productSlug     String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@unique([chatId, sourceMessageId])
+}
+
+enum TelegramDraftStatus {
+  PENDING
+  PUBLISHING
+  PUBLISHED
+  CANCELLED
+}

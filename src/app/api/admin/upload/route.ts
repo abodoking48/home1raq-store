@@ -1,21 +1,9 @@
-import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/auth/admin";
-import { createServiceRoleClient } from "@/lib/supabase/admin";
-
-const STORAGE_BUCKET = "products";
-
-function uploadErrorMessage(err: {
-  message?: string;
-  statusCode?: string;
-}): string {
-  const msg = err.message ?? "";
-  const code = err.statusCode ?? "";
-  if (/bucket not found/i.test(msg) || code === "404") {
-    return `Storage bucket "${STORAGE_BUCKET}" does not exist. In Supabase: Storage → New bucket → name exactly "${STORAGE_BUCKET}" → Create → enable Public (for storefront image URLs).`;
-  }
-  return msg || "Upload failed";
-}
+import {
+  ProductImageUploadError,
+  uploadProductImage,
+} from "@/lib/products/upload";
 
 export async function POST(req: Request) {
   if (!(await getAdminUser())) {
@@ -41,30 +29,15 @@ export async function POST(req: Request) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)
-    ? ext
-    : "jpg";
-  const path = `products/${randomUUID()}.${safeExt}`;
+  const ext = file.name.split(".").pop();
 
   try {
-    const supabase = createServiceRoleClient();
-    const { error } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(path, buffer, {
-        contentType: file.type || `image/${safeExt}`,
-        upsert: false,
-      });
-    if (error) {
-      console.error(error);
-      return NextResponse.json(
-        { error: uploadErrorMessage(error) },
-        { status: 500 },
-      );
-    }
-    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    return NextResponse.json({ url: data.publicUrl });
+    const url = await uploadProductImage(buffer, ext, file.type);
+    return NextResponse.json({ url });
   } catch (e) {
+    if (e instanceof ProductImageUploadError) {
+      return NextResponse.json({ error: e.message }, { status: 500 });
+    }
     console.error(e);
     return NextResponse.json(
       { error: "Storage not configured or upload failed" },

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { isDatabaseUnreachableError } from "@/lib/db-unreachable";
 import { prisma } from "@/lib/prisma";
+import { notifyNewOrder } from "@/lib/telegram/order-notify";
 
 /** Supabase pooler / network flakiness: give interactive tx time to acquire a connection. */
 const ORDER_TX_OPTIONS = {
@@ -117,6 +118,13 @@ export async function POST(req: Request) {
         return order;
       },
       ORDER_TX_OPTIONS,
+    );
+
+    // Telegram ping to the owner; runs after the response so checkout isn't slowed.
+    after(() =>
+      notifyNewOrder(result.id).catch((e) =>
+        console.error("[orders] telegram notify failed:", e),
+      ),
     );
 
     return NextResponse.json({ id: result.id });

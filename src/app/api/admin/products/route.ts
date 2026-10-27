@@ -1,20 +1,8 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { z } from "zod";
 import { getAdminUser } from "@/lib/auth/admin";
 import { prisma } from "@/lib/prisma";
-import { slugify } from "@/lib/slug";
-
-const createSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
-  price: z.number().positive(),
-  compareAtPrice: z.number().positive().optional().nullable(),
-  onPromo: z.boolean().optional(),
-  images: z.array(z.string().url()).default([]),
-  active: z.boolean().optional(),
-  categoryId: z.string().cuid().optional().nullable(),
-});
+import { createProduct, productCreateSchema } from "@/lib/products/create";
 
 export async function GET() {
   if (!(await getAdminUser())) {
@@ -37,7 +25,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const parsed = createSchema.safeParse(json);
+  const parsed = productCreateSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validation failed", issues: parsed.error.flatten() },
@@ -45,28 +33,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const baseSlug = slugify(parsed.data.name);
-  let slug = baseSlug;
-  let n = 1;
-  while (await prisma.product.findUnique({ where: { slug } })) {
-    slug = `${baseSlug}-${n++}`;
-  }
-
   try {
-    const product = await prisma.product.create({
-      data: {
-        name: parsed.data.name,
-        slug,
-        description: parsed.data.description,
-        price: parsed.data.price,
-        compareAtPrice: parsed.data.compareAtPrice ?? null,
-        onPromo: parsed.data.onPromo ?? false,
-        images: parsed.data.images,
-        active: parsed.data.active ?? true,
-        categoryId: parsed.data.categoryId || null,
-      },
-      include: { category: true },
-    });
+    const product = await createProduct(parsed.data);
     return NextResponse.json({ product });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientValidationError) {
