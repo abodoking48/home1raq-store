@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { after } from "next/server";
 import { formatIqd } from "@/lib/currency";
 import { prisma } from "@/lib/prisma";
 import { createProduct, uniqueProductSlug } from "@/lib/products/create";
@@ -10,7 +11,7 @@ import {
   sendMessage,
   tg,
 } from "@/lib/telegram/api";
-import { CAPTION_TEMPLATE, validateCaption } from "@/lib/telegram/caption";
+import { CAPTION_TEMPLATE, type ValidDraft, validateCaption } from "@/lib/telegram/caption";
 
 /** Subset of the Telegram Update object the bot reads. */
 export type TgUpdate = {
@@ -34,11 +35,17 @@ type TgMessage = {
   photo?: { file_id: string; width: number; height: number }[];
 };
 
-/** Album photos arrive as separate updates; give the rest of the album time to land. */
+/**
+ * Album photos arrive as separate updates, and Telegram only sends the next update
+ * after we respond to the current one. So the preview is built after the response
+ * (`after`), once the rest of the album has had time to land.
+ */
 function albumWaitMs() {
   const v = Number(process.env.TELEGRAM_ALBUM_WAIT_MS);
-  return Number.isFinite(v) && v >= 0 ? v : 2500;
+  return Number.isFinite(v) && v >= 0 ? v : 4000;
 }
+
+const SERVER_ERROR_TEXT = "⚠️ صار خطأ بالسيرفر وما گدرت أجهّز المعاينة. جرّب تدز الصور مرة ثانية.";
 
 const HELP_TEXT = [
   "هلا بيك 👋 حتى تنشر منتج بالموقع:",
@@ -69,7 +76,7 @@ export async function handleUpdate(update: TgUpdate) {
     } catch (e) {
       console.error("[telegram] photo handling failed:", e);
       if (msg.caption?.trim()) {
-        await sendMessage(msg.chat.id, "⚠️ صار خطأ بالسيرفر وما گدرت أجهّز المعاينة. جرّب تدز الصور مرة ثانية.");
+        await sendMessage(msg.chat.id, SERVER_ERROR_TEXT);
       }
     }
     return;
@@ -121,18 +128,34 @@ async function handlePhoto(msg: TgMessage) {
     return;
   }
 
-  if (msg.media_group_id) {
-    await new Promise((r) => setTimeout(r, albumWaitMs()));
+  if (!msg.media_group_id) {
+    await sendPreview(msg, result.draft);
+    return;
   }
+  after(async () => {
+    try {
+      await new Promise((r) => setTimeout(r, albumWaitMs()));
+      await sendPreview(msg, result.draft);
+    } catch (e) {
+      console.error("[telegram] album preview failed:", e);
+      await sendMessage(msg.chat.id, SERVER_ERROR_TEXT).catch(() => {});
+    }
+  });
+}
+
+/** Photo file_ids of the album `messageId` belongs to (or just that photo), in send order. */
+async function albumFileIds(chatId: string, messageId: number, mediaGroupId?: string | null) {
   const photos = await prisma.telegramPhoto.findMany({
-    where: msg.media_group_id
-      ? { chatId, mediaGroupId: msg.media_group_id }
-      : { chatId, messageId: msg.message_id },
+    where: mediaGroupId ? { chatId, mediaGroupId } : { chatId, messageId },
     orderBy: { messageId: "asc" },
   });
-  const fileIds = photos.map((p) => p.fileId).slice(0, 10);
+  return photos.map((p) => p.fileId).slice(0, 10);
+}
 
-  const { draft } = result;
+async function sendPreview(msg: TgMessage, draft: ValidDraft) {
+  const chatId = String(msg.chat.id);
+  const fileIds = await albumFileIds(chatId, msg.message_id, msg.media_group_id);
+
   let draftId: string;
   try {
     const row = await prisma.telegramDraft.create({
@@ -252,8 +275,17 @@ async function handleCallback(cb: NonNullable<TgUpdate["callback_query"]>) {
 
   const draft = await prisma.telegramDraft.findUniqueOrThrow({ where: { id: draftId } });
   try {
+    // Pick up album photos that landed after the preview was built.
+    const source = await prisma.telegramPhoto.findUnique({
+      where: { chatId_messageId: { chatId: draft.chatId, messageId: draft.sourceMessageId } },
+    });
+    const latest = source?.mediaGroupId
+      ? await albumFileIds(draft.chatId, draft.sourceMessageId, source.mediaGroupId)
+      : [];
+    const fileIds = latest.length > draft.fileIds.length ? latest : draft.fileIds;
+
     const images: string[] = [];
-    for (const fileId of draft.fileIds) {
+    for (const fileId of fileIds) {
       const file = await downloadFile(fileId);
       const type = file.contentType?.startsWith("image/") ? file.contentType : undefined;
       images.push(await uploadProductImage(file.buffer, file.ext, type));
