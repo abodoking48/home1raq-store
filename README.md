@@ -56,7 +56,7 @@ and listed on `/products?promo=1`).
 **How it works:** send the product photos as one album with this caption → the bot replies with a
 preview and **✅ نشر / ❌ إلغاء** → on ✅ it uploads the photos, creates the product and replies
 with the live link. New orders from `/checkout` are also sent to the owner (items, total,
-city/area; phone masked, no street address).
+customer name, full phone (tap to copy / call, plus a WhatsApp button), city and address).
 
 ### Caption template (انسخه)
 
