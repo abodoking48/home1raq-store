@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { LayoutGrid, MessageCircle, Search } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState, useTransition } from "react";
+import { LayoutGrid, Loader2, MessageCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { trackMeta } from "@/lib/ads";
-import { matchesQuery } from "@/lib/arabic";
+import { matchesQuery, rankByQuery } from "@/lib/arabic";
 import { formatIqdNumber } from "@/lib/currency";
 import { productPath } from "@/lib/site";
 import { whatsappLink } from "@/lib/store-info";
@@ -51,6 +51,8 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
   const [index, setIndex] = useState<SearchIndex | null>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  // Server-rendered results can take a moment; show a spinner until the navigation lands.
+  const [navigating, startNavigation] = useTransition();
   const placeholder = siteCopy.nav.searchPlaceholder;
 
   useEffect(() => setQuery(initialQuery), [initialQuery]);
@@ -78,8 +80,7 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
   const allHref = `/products?q=${encodeURIComponent(q)}`;
   const options = useMemo<Option[]>(() => {
     if (!q || !index) return [];
-    const products = index.products
-      .filter((p) => matchesQuery(`${p.name} ${p.category ?? ""}`, q))
+    const products = rankByQuery(index.products, q, (p) => ({ name: p.name, category: p.category }))
       .slice(0, 6)
       .map((item): Option => ({ kind: "product", href: productPath(item.slug), item }));
     const categories = index.categories
@@ -98,18 +99,18 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
 
   const go = (href: string) => {
     setOpen(false);
-    router.push(href);
+    startNavigation(() => router.push(href));
   };
 
   const submit = () => {
     const term = query.trim();
     setOpen(false);
     if (!term) {
-      router.push("/products");
+      startNavigation(() => router.push("/products"));
       return;
     }
     trackMeta("Search", { search_string: term });
-    router.push(`/products?q=${encodeURIComponent(term)}`);
+    startNavigation(() => router.push(`/products?q=${encodeURIComponent(term)}`));
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -161,6 +162,7 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
             setOpen(true);
           }}
           onKeyDown={onKeyDown}
+          aria-busy={navigating}
           aria-label={placeholder}
           placeholder={placeholder}
           className="h-9 w-full min-w-0 rounded-xl border-white/10 bg-white/5 py-2 pe-9 ps-3 text-sm sm:h-10 sm:w-52 sm:pe-10 sm:ps-4 md:w-64 [&::-webkit-search-cancel-button]:hidden"
@@ -170,8 +172,17 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
           aria-label={placeholder}
           className="absolute end-1 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center text-white/40 hover:text-primary"
         >
-          <Search className="size-4" aria-hidden />
+          {navigating ? (
+            <Loader2 className="size-4 animate-spin text-primary" aria-hidden />
+          ) : (
+            <Search className="size-4" aria-hidden />
+          )}
         </button>
+        {navigating && (
+          <span className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 overflow-hidden rounded-full">
+            <span className="block h-full w-1/3 animate-[search-progress_1s_ease-in-out_infinite] bg-primary" />
+          </span>
+        )}
       </form>
 
       {showPanel && (

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
-import { matchesQuery } from "@/lib/arabic";
+import { rankByQuery } from "@/lib/arabic";
 import { prisma } from "@/lib/prisma";
 import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
@@ -88,9 +88,15 @@ export default async function ProductsPage({ searchParams }: Props) {
   if (q) {
     // Arabic-aware matching (أ/ا, ة/ه, tashkeel, digits) — the catalog is small, so filter in memory.
     const all = await prisma.product.findMany({ where, orderBy, include: { category: true } });
-    const matched = all.filter((p) =>
-      matchesQuery(`${p.name} ${p.description} ${p.category?.name ?? ""}`, q),
-    );
+    // Name matches first, then category; description-only matches only when nothing else hits.
+    // An explicit price sort still wins over relevance.
+    const ranked = rankByQuery(all, q, (p) => ({
+      name: p.name,
+      category: p.category?.name,
+      description: p.description,
+    }));
+    const matched =
+      sort === "latest" ? ranked : all.filter((p) => ranked.includes(p));
     total = matched.length;
     products = matched.slice(skip, skip + PAGE_SIZE);
   } else {
