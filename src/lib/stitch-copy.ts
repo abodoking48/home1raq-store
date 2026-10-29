@@ -66,16 +66,16 @@ export const siteCopy = {
     addToCart: "أضف إلى السلة",
     buyNow: "اشترِ الآن",
     addedToast: "تمت الإضافة إلى السلة",
+    orderWhatsapp: "اطلب عبر واتساب",
   },
   productsPage: {
     title: "جميع المنتجات",
     subtitle:
-      "تصفح كامل تشكيلة الأجهزة المنزلية والذكية — نفس تجربة التصفح الزجاجية من تصميم Stitch.",
-    empty: "لا توجد منتجات حالياً. تابع لوحة الإدارة لإضافة منتجات جديدة.",
+      "تصفح كامل تشكيلة الأجهزة المنزلية والذكية بأسعار منافسة.",
+    empty: "لا توجد منتجات حالياً.",
     promoTitle: "العروض والخصومات",
-    promoSubtitle: "منتجات مختارة بأسعار مميزة — يُحدَّد العرض من لوحة الإدارة.",
-    promoEmpty:
-      "لا توجد منتجات في العروض حالياً. فعّل «ضمن العروض» لمنتجات من الإدارة.",
+    promoSubtitle: "منتجات مختارة بأسعار مميزة.",
+    promoEmpty: "لا توجد منتجات في العروض حالياً — تابعنا قريباً.",
   },
   cart: {
     title: "سلة التسوق",
@@ -84,9 +84,7 @@ export const siteCopy = {
     contentsTitle: "محتويات السلة",
     summary: "ملخص السلة",
     continue: "متابعة الطلب",
-    vatNote: "شامل ضريبة القيمة المضافة",
     delivery: "الوقت المقدر للتوصيل:",
-    deliveryRange: "24 - 48 ساعة",
   },
   checkout: {
     title: "إتمام الطلب",
@@ -97,7 +95,8 @@ export const siteCopy = {
     fullName: "الاسم الكامل",
     fullNamePlaceholder: "مثال: محمد علي كمال",
     phone: "رقم الهاتف",
-    phonePlaceholder: "07XXXXXXXX",
+    phonePlaceholder: "07XXXXXXXXX",
+    cityPlaceholder: "اختر المحافظة",
     city: "المدينة",
     district: "المنطقة",
     districtPlaceholder: "اسم الحي",
@@ -113,12 +112,14 @@ export const siteCopy = {
     blurb:
       "متجرك الأول في العراق لكل ما يخص المنزل الذكي والرفاهية التكنولوجية. نحن نوفر لك أحدث المنتجات العالمية بضمان حقيقي وتوصيل سريع.",
     quickTitle: "روابط سريعة",
-    socialTitle: "تواصل اجتماعي",
+    socialTitle: "تواصل معنا",
     quickLinks: [
       { label: "الرئيسية", href: "/" },
       { label: "المنتجات", href: "/products" },
       { label: "العروض", href: "/products?promo=1" },
       { label: "السلة", href: "/cart" },
+      { label: "من نحن", href: "/about" },
+      { label: "الاستبدال والإرجاع", href: "/returns" },
     ],
     socialLinks: [
       {
