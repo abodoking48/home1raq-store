@@ -26,31 +26,30 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative flex flex-col items-center justify-center overflow-hidden px-4 pt-4 md:px-6 md:pt-6"
-      style={{ minHeight: "85svh" }}
+      className="relative flex flex-col items-center justify-center overflow-hidden px-4 pt-2 md:min-h-[85svh] md:px-6 md:pt-6"
     >
       <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.12)_0%,rgba(2,4,3,0)_70%)]" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.1)_0%,rgba(2,4,3,0)_70%)]" />
 
-      <div className="relative z-10 mx-auto max-w-5xl space-y-8 py-4 text-center md:space-y-10 md:py-6">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-5 py-2 text-sm font-medium text-primary">
+      <div className="relative z-10 mx-auto max-w-5xl space-y-4 py-4 text-center md:space-y-10 md:py-6">
+        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary md:px-5 md:py-2 md:text-sm">
           <Sparkles className="size-4 shrink-0" aria-hidden />
           {h.badge}
         </div>
-        <h1 className="font-heading text-5xl font-black leading-[1.1] tracking-tight text-foreground md:text-7xl lg:text-8xl">
+        <h1 className="font-heading text-4xl font-black leading-[1.1] tracking-tight text-foreground md:text-7xl lg:text-8xl">
           {h.titleBefore}
           <br />
           <span className="text-primary">{h.titleBrand}</span>
         </h1>
-        <p className="mx-auto max-w-3xl text-lg font-light leading-relaxed text-muted-foreground md:text-2xl">
+        <p className="mx-auto hidden max-w-3xl text-lg font-light md:block leading-relaxed text-muted-foreground md:text-2xl">
           {h.subtitle}
         </p>
-        <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row sm:gap-6">
+        <div className="flex flex-row items-center justify-center gap-3 pt-1 sm:gap-6 md:pt-2">
           <Link
             href="/products"
             className={cn(
               buttonVariants({ size: "lg" }),
-              "inline-flex min-h-14 items-center gap-3 rounded-2xl bg-primary px-10 py-6 text-lg font-bold text-primary-foreground shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-transform hover:scale-[1.02] active:scale-[0.98]",
+              "inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 py-4 text-base font-bold md:min-h-14 md:gap-3 md:px-10 md:py-6 md:text-lg text-primary-foreground shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-transform hover:scale-[1.02] active:scale-[0.98]",
             )}
           >
             {h.ctaPrimary}
@@ -60,7 +59,7 @@ export function HeroSection() {
             href="/#community"
             className={cn(
               buttonVariants({ size: "lg", variant: "outline" }),
-              "min-h-14 rounded-2xl border-white/10 bg-white/[0.08] px-10 py-6 text-lg font-medium transition-transform hover:bg-white/10 active:scale-[0.98]",
+              "min-h-12 rounded-2xl border-white/10 bg-white/[0.08] px-5 py-4 text-base font-medium md:min-h-14 md:px-10 md:py-6 md:text-lg transition-transform hover:bg-white/10 active:scale-[0.98]",
             )}
           >
             {h.ctaSecondary}
@@ -76,7 +75,7 @@ export function HeroSection() {
         onClick={scrollToCategories}
         aria-label="اكتشف المزيد"
         className={cn(
-          "z-20 mb-6 flex w-fit flex-col items-center gap-1 text-primary transition-all duration-300",
+          "z-20 mb-6 hidden w-fit flex-col items-center gap-1 text-primary md:flex transition-all duration-300",
           showScrollIndicator
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-2 opacity-0",

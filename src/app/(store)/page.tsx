@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import dynamicImport from "next/dynamic";
 import { HeroSection } from "@/components/home/hero-section";
 import { HomeCategories } from "@/components/home/home-categories";
 import { HomeCategoriesReveal } from "@/components/home/home-categories-reveal";
+import { CustomerReviews } from "@/components/home/customer-reviews";
+import { HomeOffersStrip } from "@/components/home/home-offers-strip";
 import { HomeProductBlocks } from "@/components/home/home-product-blocks";
 import { HomePromoSection } from "@/components/home/home-promo-section";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,13 +23,16 @@ const HomeNewsletter = dynamicImport(
 
 export const revalidate = 120;
 
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
 export default async function HomePage() {
   let latestRows: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
   let popularFinalRows: typeof latestRows = [];
+  let promoRows: typeof latestRows = [];
   let dbUnavailable = false;
 
   try {
-    const [latest, popularOrderStats] = await Promise.all([
+    const [latest, popularOrderStats, promo] = await Promise.all([
       prisma.product.findMany({
         where: { active: true },
         orderBy: { createdAt: "desc" },
@@ -38,9 +44,16 @@ export default async function HomePage() {
         orderBy: { _sum: { quantity: "desc" } },
         take: 8,
       }),
+      prisma.product.findMany({
+        where: { active: true, onPromo: true },
+        orderBy: { updatedAt: "desc" },
+        take: 8,
+      }),
     ]);
 
     latestRows = latest;
+    // Offers first; top up with the newest products so the strip is never sparse.
+    promoRows = [...promo, ...latest.filter((p) => !promo.some((r) => r.id === p.id))].slice(0, 8);
 
     const popularProductIds = popularOrderStats.map((row) => row.productId);
     const popularRowsRaw =
@@ -79,6 +92,16 @@ export default async function HomePage() {
     images: p.images,
   }));
 
+  const stripProducts = promoRows.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    price: Number(p.price),
+    compareAtPrice: p.compareAtPrice != null ? Number(p.compareAtPrice) : null,
+    onPromo: p.onPromo,
+    images: p.images,
+  }));
+
   const popularProducts = popularFinalRows.map((p) => ({
     id: p.id,
     slug: p.slug,
@@ -106,6 +129,7 @@ export default async function HomePage() {
         </div>
       ) : null}
       <HeroSection />
+      <HomeOffersStrip products={stripProducts} />
       <HomeCategoriesReveal />
       <HomeCategories />
 
@@ -115,7 +139,7 @@ export default async function HomePage() {
             <p className="text-lg text-muted-foreground">
               {dbUnavailable
                 ? "لا يمكن تحميل المنتجات حالياً بسبب انقطاع الاتصال بقاعدة البيانات. بعد إصلاح الإعدادات، ستظهر المنتجات هنا تلقائياً."
-                : "لا توجد منتجات في المتجر بعد. أضف منتجات من لوحة الإدارة لعرضها هنا بنفس تخطيط Stitch."}
+                : "لا توجد منتجات في المتجر بعد."}
             </p>
             <Link
               href="/products"
@@ -136,6 +160,7 @@ export default async function HomePage() {
       )}
 
       <HomePromoSection />
+      <CustomerReviews />
       <HomeNewsletter />
     </div>
   );
