@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/next';
 import {
   Geist_Mono,
@@ -60,6 +60,8 @@ export const metadata: Metadata = {
     },
   },
 };
+
+export const viewport: Viewport = { themeColor: "#020403" };
 
 /** Meta Pixel — override with NEXT_PUBLIC_META_PIXEL_ID in .env.local */
 const META_PIXEL_ID =
