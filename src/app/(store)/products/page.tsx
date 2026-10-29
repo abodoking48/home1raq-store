@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
+import { matchesQuery } from "@/lib/arabic";
 import { prisma } from "@/lib/prisma";
 import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
@@ -74,31 +75,30 @@ export default async function ProductsPage({ searchParams }: Props) {
     active: true,
     ...(promoActive ? { onPromo: true } : {}),
     ...(category ? { category: { slug: category } } : {}),
-    ...(q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" as const } },
-            { description: { contains: q, mode: "insensitive" as const } },
-          ],
-        }
-      : {}),
   };
+  const orderBy =
+    sort === "price-asc"
+      ? { price: "asc" as const }
+      : sort === "price-desc"
+        ? { price: "desc" as const }
+        : { updatedAt: "desc" as const };
 
-  const [total, products] = await Promise.all([
-    prisma.product.count({ where }),
-    prisma.product.findMany({
-      where,
-      orderBy:
-        sort === "price-asc"
-          ? { price: "asc" }
-          : sort === "price-desc"
-            ? { price: "desc" }
-            : { updatedAt: "desc" },
-      include: { category: true },
-      skip,
-      take: PAGE_SIZE,
-    }),
-  ]);
+  let total: number;
+  let products: Awaited<ReturnType<typeof prisma.product.findMany<{ include: { category: true } }>>>;
+  if (q) {
+    // Arabic-aware matching (أ/ا, ة/ه, tashkeel, digits) — the catalog is small, so filter in memory.
+    const all = await prisma.product.findMany({ where, orderBy, include: { category: true } });
+    const matched = all.filter((p) =>
+      matchesQuery(`${p.name} ${p.description} ${p.category?.name ?? ""}`, q),
+    );
+    total = matched.length;
+    products = matched.slice(skip, skip + PAGE_SIZE);
+  } else {
+    [total, products] = await Promise.all([
+      prisma.product.count({ where }),
+      prisma.product.findMany({ where, orderBy, include: { category: true }, skip, take: PAGE_SIZE }),
+    ]);
+  }
 
   const c = siteCopy.productsPage;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
