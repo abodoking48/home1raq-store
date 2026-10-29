@@ -24,9 +24,26 @@ function iqParams(value: number, contentId: string, contentName: string) {
   };
 }
 
-export function trackMeta(event: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("track", event, params);
+/**
+ * The Meta Pixel loads with `lazyOnload`, so early events (e.g. ViewContent on mount) would be
+ * dropped; retry for a while until `fbq` exists.
+ */
+export function trackMeta(
+  event: string,
+  params?: Record<string, unknown>,
+  options?: { eventID?: string },
+) {
+  if (typeof window === "undefined") return;
+  let tries = 0;
+  const send = () => {
+    if (window.fbq) {
+      if (options) window.fbq("track", event, params, options);
+      else window.fbq("track", event, params);
+    } else if (tries++ < 40) {
+      setTimeout(send, 500);
+    }
+  };
+  send();
 }
 
 export function trackTikTok(event: string, params?: Record<string, unknown>) {
@@ -124,4 +141,41 @@ export function trackPurchase(order: {
     currency: "IQD",
     quantity: String(order.quantity),
   });
+}
+
+export type CartEventLine = { productId: string; name: string; price: number; quantity: number };
+
+function cartParams(lines: CartEventLine[]) {
+  return {
+    value: lines.reduce((sum, l) => sum + l.price * l.quantity, 0),
+    currency: "IQD",
+    content_ids: lines.map((l) => l.productId),
+    content_type: "product",
+    contents: lines.map((l) => ({ id: l.productId, quantity: l.quantity, item_price: l.price })),
+    num_items: lines.reduce((sum, l) => sum + l.quantity, 0),
+  };
+}
+
+/** Storefront checkout (whole cart). */
+export function trackCartInitiateCheckout(lines: CartEventLine[]) {
+  const p = cartParams(lines);
+  trackMeta("InitiateCheckout", p);
+  trackTikTok("InitiateCheckout", { value: p.value, currency: "IQD", contents: p.contents });
+}
+
+/**
+ * Storefront order placed. Fires once per order: `eventID` lets Meta dedupe, and a
+ * localStorage mark stops repeats in this browser.
+ */
+export function trackCartPurchase(orderId: string, lines: CartEventLine[]) {
+  const key = `h1q-purchase-${orderId}`;
+  try {
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {
+    /* storage blocked: still fire; eventID dedupes on Meta's side */
+  }
+  const p = cartParams(lines);
+  trackMeta("Purchase", p, { eventID: `order-${orderId}` });
+  trackTikTok("CompletePayment", { value: p.value, currency: "IQD", contents: p.contents });
 }
