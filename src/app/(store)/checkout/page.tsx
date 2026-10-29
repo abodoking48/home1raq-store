@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/contexts/cart-context";
+import { trackCartInitiateCheckout, trackCartPurchase } from "@/lib/ads";
 import { formatIqd } from "@/lib/currency";
+import { iraqiPhone, toAsciiDigits } from "@/lib/phone";
+import { DELIVERY, IRAQ_GOVERNORATES } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +21,7 @@ export default function CheckoutPage() {
   const { lines, subtotal, clear } = useCart();
   const q = siteCopy.checkout;
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ phone?: string; fullName?: string }>({});
+  const [errors, setErrors] = useState<{ phone?: string; fullName?: string; city?: string }>({});
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
@@ -28,15 +31,24 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (checkoutTracked.current || lines.length === 0) return;
+    checkoutTracked.current = true;
+    trackCartInitiateCheckout(lines);
+  }, [lines]);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const phone = form.phone.trim();
+    const normalizedPhone = iraqiPhone(form.phone);
+    const phone = normalizedPhone.local;
     const fullName = form.fullName.trim();
-    const nextErrors: { phone?: string; fullName?: string } = {};
+    const nextErrors: { phone?: string; fullName?: string; city?: string } = {};
     if (fullName.length < 2) nextErrors.fullName = "الاسم يجب أن يكون حرفين على الأقل";
-    if (!/^(\+?964|0)?7\d{9}$/.test(phone.replace(/\s+/g, ""))) {
-      nextErrors.phone = "رقم الهاتف غير صالح (مثال: 07XXXXXXXX)";
+    if (!normalizedPhone.intl) {
+      nextErrors.phone = "رقم الهاتف غير صالح — اكتبه هيج: 07XXXXXXXXX (11 رقم)";
     }
+    if (!form.city) nextErrors.city = "اختر المحافظة";
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
@@ -71,6 +83,7 @@ export default function CheckoutPage() {
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
+        id?: string;
         error?: string;
         message?: string;
       };
@@ -78,6 +91,7 @@ export default function CheckoutPage() {
         toast.error(data.message ?? data.error ?? "تعذر إرسال الطلب");
         return;
       }
+      if (data.id) trackCartPurchase(data.id, lines);
       clear();
       toast.success(q.successToast);
       router.push("/products");
@@ -123,10 +137,30 @@ export default function CheckoutPage() {
           </h2>
 
           <div className="grid gap-2">
+            <Label htmlFor="phone">{q.phone}</Label>
+            <Input
+              id="phone"
+              required
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              maxLength={16}
+              dir="ltr"
+              placeholder={q.phonePlaceholder}
+              value={form.phone}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, phone: toAsciiDigits(e.target.value) }))
+              }
+              className="rounded-xl border-0 bg-white/5 py-4 ring-1 ring-white/10 focus-visible:ring-primary/40"
+            />
+            {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="fullName">{q.fullName}</Label>
             <Input
               id="fullName"
               required
+              autoComplete="name"
               placeholder={q.fullNamePlaceholder}
               value={form.fullName}
               onChange={(e) =>
@@ -139,30 +173,27 @@ export default function CheckoutPage() {
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="phone">{q.phone}</Label>
-            <Input
-              id="phone"
-              required
-              inputMode="tel"
-              dir="ltr"
-              placeholder={q.phonePlaceholder}
-              value={form.phone}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, phone: e.target.value }))
-              }
-              className="rounded-xl border-0 bg-white/5 py-4 ring-1 ring-white/10 focus-visible:ring-primary/40"
-            />
-            {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
-          </div>
-          <div className="grid gap-2">
             <Label htmlFor="city">{q.city}</Label>
-            <Input
+            <select
               id="city"
               required
               value={form.city}
               onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-              className="rounded-xl border-0 bg-white/5 py-4 ring-1 ring-white/10 focus-visible:ring-primary/40"
-            />
+              className={cn(
+                "h-12 w-full rounded-xl border-0 bg-white/5 px-3 text-base ring-1 ring-white/10 outline-none focus-visible:ring-primary/40",
+                !form.city && "text-muted-foreground",
+              )}
+            >
+              <option value="" disabled>
+                {q.cityPlaceholder}
+              </option>
+              {IRAQ_GOVERNORATES.map((g) => (
+                <option key={g} value={g} className="bg-[#0a0c0b] text-foreground">
+                  {g}
+                </option>
+              ))}
+            </select>
+            {errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="district">{q.district}</Label>
@@ -182,6 +213,7 @@ export default function CheckoutPage() {
               id="address"
               required
               rows={3}
+              autoComplete="street-address"
               placeholder={q.addressPlaceholder}
               value={form.address}
               onChange={(e) =>
@@ -236,14 +268,12 @@ export default function CheckoutPage() {
               <span className="flex items-center gap-2">
                 <span>الإجمالي</span>
                 <span className="text-sm font-semibold text-emerald-400">
-                  توصيل مجاني 🚚
+                  {DELIVERY.short}
                 </span>
               </span>
               <span>{formatIqd(subtotal)}</span>
             </div>
-            <p className="mt-1 text-[10px] text-muted-foreground">
-              {siteCopy.cart.vatNote}
-            </p>
+            <p className="mt-2 text-xs text-muted-foreground">{DELIVERY.sentence}</p>
           </div>
           <div className="mt-5 grid gap-3 text-xs text-muted-foreground">
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">

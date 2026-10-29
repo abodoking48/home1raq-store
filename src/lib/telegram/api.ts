@@ -1,3 +1,5 @@
+import { productPath, SITE_URL } from "@/lib/site";
+
 /** Minimal Telegram Bot API client (server-only). Token comes from TELEGRAM_BOT_TOKEN. */
 
 function botToken() {
@@ -63,9 +65,9 @@ export function allowedUserIds(): Set<string> {
 }
 
 export function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.home1raq.com").replace(/\/+$/, "");
+  return SITE_URL;
 }
 
 export function productUrl(slug: string) {
-  return `${siteUrl()}/products/${encodeURIComponent(slug)}`;
+  return `${SITE_URL}${productPath(slug)}`;
 }

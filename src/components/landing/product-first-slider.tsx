@@ -17,6 +17,7 @@ import { formatIqd } from "@/lib/currency";
 import { LANDING_FALLBACK_PRODUCT_IMAGE } from "@/lib/landing-defaults";
 import type { LandingProductPayload } from "@/lib/landing-settings";
 import { cn } from "@/lib/utils";
+import { DELIVERY } from "@/lib/store-info";
 
 function thumbSrc(p: LandingProductPayload) {
   const u = p.images[0];
@@ -589,7 +590,7 @@ export function ProductFirstSlider({
             ) : null}
           </div>
           <p className="inline-flex w-fit items-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-sm font-semibold text-emerald-300 md:text-base">
-            🚚 توصيل مجاني لجميع أنحاء العراق
+            🚚 {DELIVERY.sentence}
           </p>
 
           {onPrimaryCtaClick ? (

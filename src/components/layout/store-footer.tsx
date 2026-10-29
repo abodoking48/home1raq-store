@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Home } from "lucide-react";
+import { STORE_WHATSAPP_LOCAL, whatsappLink } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 
 export function StoreFooter() {
@@ -40,6 +41,16 @@ export function StoreFooter() {
         <div>
           <h4 className="mb-6 text-lg font-bold text-foreground">{f.socialTitle}</h4>
           <ul className="space-y-4">
+            <li>
+              <a
+                href={whatsappLink("مرحباً Home1raq")}
+                target="_blank"
+                rel="noreferrer"
+                className="text-white/60 transition-colors hover:text-primary"
+              >
+                واتساب: <span dir="ltr" className="tabular-nums">{STORE_WHATSAPP_LOCAL}</span>
+              </a>
+            </li>
             {f.socialLinks.map((l) => (
               <li key={l.label}>
                 <a

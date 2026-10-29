@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { formatIqd } from "@/lib/currency";
+import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
 
@@ -129,24 +130,22 @@ export default function CartPage() {
               ))}
             </ul>
             <div className="mt-6 border-t border-white/10 pt-4">
-              <div className="mb-2 flex justify-between text-sm text-muted-foreground">
-                <span>خصم الأعضاء</span>
-                <span>—</span>
-              </div>
               <div className="flex justify-between font-heading text-xl text-primary">
                 <span className="flex items-center gap-2">
                   <span>الإجمالي</span>
                   <span className="text-sm font-semibold text-emerald-400">
-                    توصيل مجاني 🚚
+                    {DELIVERY.short}
                   </span>
                 </span>
                 <span>{formatIqd(subtotal)}</span>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground">{c.vatNote}</p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {c.delivery}{" "}
-                <span className="font-bold text-foreground">{c.deliveryRange}</span>
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">{DELIVERY.sentence}</p>
+              {DELIVERY.time && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {c.delivery}{" "}
+                  <span className="font-bold text-foreground">{DELIVERY.time}</span>
+                </p>
+              )}
             </div>
             <Link
               href="/checkout"

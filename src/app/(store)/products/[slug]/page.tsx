@@ -1,11 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AddToCartButton } from "@/components/product/add-to-cart-button";
+import { cache } from "react";
+import { CustomerReviews } from "@/components/home/customer-reviews";
+import {
+  AddToCartButton,
+  ProductBuyBar,
+  TrackViewContent,
+} from "@/components/product/add-to-cart-button";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductCard } from "@/components/product/product-card";
 import { buildSlugCandidates } from "@/lib/product-slug";
 import { prisma } from "@/lib/prisma";
 import { formatIqdNumber } from "@/lib/currency";
+import { productPath } from "@/lib/site";
+import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 
 export const revalidate = 3600;
@@ -13,16 +22,39 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export default async function ProductDetailPage({ params }: Props) {
-  const { slug } = await params;
-  const slugCandidates = buildSlugCandidates(slug);
-  const product = await prisma.product.findFirst({
+/** Shared by generateMetadata and the page (one query per request). */
+const getProduct = cache(async (slug: string) =>
+  prisma.product.findFirst({
     where: {
       active: true,
-      OR: slugCandidates.map((s) => ({ slug: s })),
+      OR: buildSlugCandidates(slug).map((s) => ({ slug: s })),
     },
     include: { category: true },
-  });
+  }),
+);
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const product = await getProduct((await params).slug);
+  if (!product) return { title: `المنتج غير موجود | ${siteCopy.brand.name}` };
+
+  const title = `${product.name} | ${siteCopy.brand.name}`;
+  const firstLine = product.description.split(/\r?\n/).find((l) => l.trim())?.trim() ?? "";
+  const description = `${formatIqdNumber(Number(product.price))} د.ع — ${DELIVERY.sentence}. ${firstLine}`.slice(0, 200);
+  const url = productPath(product.slug);
+  const images = product.images[0] ? [{ url: product.images[0], alt: product.name }] : undefined;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { type: "website", siteName: siteCopy.brand.name, locale: "ar_IQ", url, title, description, images },
+    twitter: { card: "summary_large_image", title, description, images: images?.map((i) => i.url) },
+  };
+}
+
+export default async function ProductDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) notFound();
 
@@ -41,6 +73,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
+      <TrackViewContent productId={product.id} name={product.name} price={price} />
       <div className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
         <Link href="/" className="hover:text-primary">
           الرئيسية
@@ -101,7 +134,7 @@ export default async function ProductDetailPage({ params }: Props) {
               </p>
             </div>
             <p className="mt-3 inline-flex w-fit items-center rounded-full bg-primary/20 px-3 py-1 text-sm font-bold text-primary ring-1 ring-primary/30 md:text-base">
-              🚚 توصيل مجاني لجميع أنحاء العراق
+              🚚 {DELIVERY.sentence}
             </p>
           </div>
 
@@ -118,9 +151,10 @@ export default async function ProductDetailPage({ params }: Props) {
               </p>
             </div>
             <div className="glass-panel rounded-2xl p-4">
-              <h3 className="font-bold text-foreground">توصيل سريع</h3>
+              <h3 className="font-bold text-foreground">التوصيل</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                تجهيز الطلبات يومياً والتوصيل لمعظم المحافظات العراقية.
+                {DELIVERY.sentence}
+                {DELIVERY.time ? ` — خلال ${DELIVERY.time}` : ""}.
               </p>
             </div>
           </div>
@@ -162,6 +196,15 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         )}
       </section>
+      <CustomerReviews />
+      <ProductBuyBar
+        productId={product.id}
+        slug={product.slug}
+        name={product.name}
+        price={price}
+        compareAtPrice={compareAt}
+        image={product.images[0] ?? null}
+      />
     </div>
   );
 }
