@@ -119,19 +119,29 @@ export function ProductForm({ mode, productId, initial, categories }: Props) {
 
   async function remove() {
     if (!productId) return;
-    if (!confirm("حذف هذا المنتج نهائياً؟")) return;
+    if (
+      !confirm(
+        "حذف هذا المنتج؟\nإذا عليه طلبات سابقة راح ينخفي من المتجر بدل الحذف، حتى يبقى سجل الطلبات.",
+      )
+    )
+      return;
     const res = await fetch(`/api/admin/products/${productId}`, {
       method: "DELETE",
     });
     const data = (await res.json().catch(() => ({}))) as {
       error?: string;
       message?: string;
+      archived?: boolean;
     };
     if (!res.ok) {
-      toast.error(data.message ?? data.error ?? "تعذر الحذف");
+      toast.error(data.message ?? data.error ?? `تعذر الحذف (${res.status})`);
       return;
     }
-    toast.success("تم الحذف");
+    if (data.archived) {
+      toast.success(data.message ?? "انخفى المنتج من المتجر لأن عليه طلبات.", { duration: 8000 });
+    } else {
+      toast.success("تم الحذف");
+    }
     router.push("/admin/products");
     router.refresh();
   }
