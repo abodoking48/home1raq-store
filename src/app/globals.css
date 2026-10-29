@@ -203,3 +203,12 @@
     @apply bg-gradient-to-br from-[#00ff88] to-[#00ed7e] text-[#006532] shadow-[0_0_24px_rgba(0,255,136,0.28)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99];
   }
 }
+/* Product page sticky buy bar (mobile): keep the WhatsApp float and page end clear of it. */
+@media (max-width: 767px) {
+  body:has([data-buybar]) .wa-float {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  body:has([data-buybar]) footer {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
