@@ -10,6 +10,7 @@ import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/contexts/cart-context";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_URL } from "@/lib/site";
 import { siteCopy } from "@/lib/stitch-copy";
 
 const fontHeading = Space_Grotesk({
@@ -38,8 +39,21 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: siteCopy.meta.title,
   description: siteCopy.meta.description,
+  openGraph: {
+    type: "website",
+    siteName: siteCopy.brand.name,
+    locale: "ar_IQ",
+    title: siteCopy.meta.title,
+    description: siteCopy.meta.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteCopy.meta.title,
+    description: siteCopy.meta.description,
+  },
   verification: {
     other: {
       "facebook-domain-verification": "lpt8k7rre4fag1n4kn0z4tigeibhif",

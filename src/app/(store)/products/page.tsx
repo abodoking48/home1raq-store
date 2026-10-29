@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
 import { prisma } from "@/lib/prisma";
+import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 
 export const revalidate = 3600;
@@ -17,6 +19,41 @@ type Props = {
 };
 
 const PAGE_SIZE = 12;
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const sp = await searchParams;
+  const c = siteCopy.productsPage;
+  const brand = siteCopy.brand.name;
+  const categorySlug = sp.category?.trim();
+  const promo = sp.promo === "1" || sp.promo === "true";
+
+  let title = `${c.title} | ${brand}`;
+  let description: string = c.subtitle;
+  let canonical = "/products";
+  if (categorySlug) {
+    const category = await prisma.category.findFirst({
+      where: { slug: categorySlug, active: true },
+      select: { name: true, slug: true, description: true },
+    });
+    if (category) {
+      title = `${category.name} | ${brand}`;
+      description = category.description?.trim() || `تسوق ${category.name} من ${brand} — ${DELIVERY.sentence}.`;
+      canonical = `/products?category=${encodeURIComponent(category.slug)}`;
+    }
+  } else if (promo) {
+    title = `${c.promoTitle} | ${brand}`;
+    description = c.promoSubtitle;
+    canonical = "/products?promo=1";
+  }
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { siteName: brand, locale: "ar_IQ", url: canonical, title, description },
+    twitter: { title, description },
+  };
+}
 
 export default async function ProductsPage({ searchParams }: Props) {
   const sp = await searchParams;
