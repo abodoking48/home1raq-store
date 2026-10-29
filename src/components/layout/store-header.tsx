@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import { Home, Search, ShoppingCart } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { Home, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { HeaderSearch } from "@/components/layout/header-search";
 import { useCart } from "@/contexts/cart-context";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
@@ -18,25 +18,11 @@ const nav = [
 
 function StoreHeaderInner() {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { itemCount } = useCart();
   const { nav: n, brand } = siteCopy;
 
   const qFromUrl = searchParams.get("q") ?? "";
-  const [searchQuery, setSearchQuery] = useState(qFromUrl);
-  useEffect(() => {
-    setSearchQuery(qFromUrl);
-  }, [qFromUrl]);
-
-  function onSearchSubmit(formData: FormData) {
-    const q = String(formData.get("q") ?? "").trim();
-    const params = new URLSearchParams(searchParams.toString());
-    if (q) params.set("q", q);
-    else params.delete("q");
-    params.delete("page");
-    router.push(`/products${params.size ? `?${params.toString()}` : ""}`);
-  }
 
   return (
     <header className="fixed top-0 z-40 flex h-20 w-full items-center justify-between border-b border-white/5 bg-background/80 px-4 backdrop-blur-xl md:px-8">
@@ -94,22 +80,7 @@ function StoreHeaderInner() {
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 md:flex-none md:shrink-0 md:gap-6">
           <div className="relative min-w-0 max-w-[min(52vw,14rem)] flex-1 sm:max-w-[16rem] sm:flex-none md:max-w-none">
-            <form action={onSearchSubmit} className="w-full">
-              <Input
-                name="q"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label={n.searchPlaceholder}
-                placeholder={n.searchPlaceholder}
-                className="h-9 w-full min-w-0 rounded-xl border-white/10 bg-white/5 py-2 pe-9 ps-3 text-sm sm:h-10 sm:w-52 sm:pe-10 sm:ps-4 md:w-64"
-              />
-              <button type="submit" aria-label={n.searchPlaceholder}>
-                <Search
-                  className="absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-white/40 sm:end-3"
-                  aria-hidden
-                />
-              </button>
-            </form>
+            <HeaderSearch initialQuery={qFromUrl} />
           </div>
 
           <Link

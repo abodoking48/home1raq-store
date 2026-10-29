@@ -8,6 +8,8 @@
  *   الوصف: ...         (optional, may span several lines)
  */
 
+import { normalizeArabic } from "@/lib/arabic";
+
 type Field = "name" | "price" | "compareAtPrice" | "category" | "description";
 
 /** Keys are compared after `normalizeArabic`. */
@@ -32,17 +34,7 @@ for (const [field, keys] of Object.entries(FIELD_KEYS) as [Field, string[]][]) {
   for (const k of keys) KEY_LOOKUP.set(normalizeArabic(k), field);
 }
 
-/** Loose Arabic normalization for matching keys and category names. */
-export function normalizeArabic(s: string) {
-  return s
-    .replace(/[ً-ْـ]/g, "") // harakat + tatweel
-    .replace(/[أإآٱ]/g, "ا")
-    .replace(/ة/g, "ه")
-    .replace(/ى/g, "ي")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
-}
+export { normalizeArabic };
 
 /**
  * "٣٥٬٠٠٠" / "35,000 د.ع" / "35 الف" → 35000. Returns null when no number is found.
