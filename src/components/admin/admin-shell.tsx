@@ -10,6 +10,7 @@ const nav = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/categories", label: "Categories" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/images", label: "Images" },
 ];
 
 export async function AdminShell({ children }: { children: React.ReactNode }) {

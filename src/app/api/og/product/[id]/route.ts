@@ -57,13 +57,15 @@ async function render(original: Buffer) {
   const photoHeight = height - ACCENT_HEIGHT;
   const input = sharp(original, { failOn: "none" }).rotate();
 
+  // A 40px thumbnail scaled back up blurs for a fraction of a full-size blur's cost;
+  // WhatsApp gives up on slow preview images, so the first (uncached) render must be quick.
+  const tiny = await input
+    .clone()
+    .resize(40, Math.round((40 * photoHeight) / width), { fit: "cover" })
+    .modulate({ brightness: 0.45 })
+    .toBuffer();
   const [backdrop, photo] = await Promise.all([
-    input
-      .clone()
-      .resize(width, photoHeight, { fit: "cover" })
-      .blur(28)
-      .modulate({ brightness: 0.45 })
-      .toBuffer(),
+    sharp(tiny).resize(width, photoHeight, { kernel: "cubic" }).blur(4).toBuffer(),
     input
       .clone()
       .resize(width - 80, photoHeight - 40, { fit: "inside", withoutEnlargement: false })
@@ -82,11 +84,11 @@ async function render(original: Buffer) {
     },
   ]);
   // Flatten the composite first so quality retries don't redo it.
-  const flat = await canvas.png().toBuffer();
+  const flat = await canvas.raw().toBuffer({ resolveWithObject: true });
 
   let out: Buffer = Buffer.alloc(0);
   for (const quality of [82, 72, 62, 50]) {
-    out = await sharp(flat).jpeg({ quality, mozjpeg: true, chromaSubsampling: "4:2:0" }).toBuffer();
+    out = await sharp(flat.data, { raw: flat.info }).jpeg({ quality, mozjpeg: true, chromaSubsampling: "4:2:0" }).toBuffer();
     if (out.length <= MAX_BYTES) break;
   }
   return out;
