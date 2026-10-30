@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { compressImage } from "@/lib/images/compress";
 import { createServiceRoleClient } from "@/lib/supabase/admin";
 
 export const STORAGE_BUCKET = "products";
@@ -25,21 +26,31 @@ export function uploadErrorMessage(err: {
 }
 
 /**
- * Uploads to `products/products/<uuid>.<ext>` and returns the public URL.
- * Shared by `/api/admin/upload` and the Telegram bot.
+ * Compresses (see `compressImage`), uploads to `products/products/<uuid>.webp` and returns the public URL.
+ * Shared by `/api/admin/upload` (product images and category icons) and the Telegram bot.
  */
 export async function uploadProductImage(
   buffer: Buffer,
   ext: string | undefined,
   contentType?: string,
 ) {
+  const compressed = await compressImage(buffer);
+  if (compressed) return storeImage(compressed.buffer, compressed.ext, compressed.contentType);
+  // Not decodable by sharp: keep the file as it came.
+  return storeImage(buffer, ext, contentType);
+}
+
+/** Stores bytes as-is under a new name (never overwrites) and returns the public URL. */
+export async function storeImage(buffer: Buffer, ext: string | undefined, contentType?: string) {
   const safeExt = safeImageExt(ext);
   const path = `products/${randomUUID()}.${safeExt}`;
+  const type = contentType && contentType !== "image/jpg" ? contentType : `image/${safeExt === "jpg" ? "jpeg" : safeExt}`;
   const supabase = createServiceRoleClient();
   const { error } = await supabase.storage
     .from(STORAGE_BUCKET)
     .upload(path, buffer, {
-      contentType: contentType || `image/${safeExt}`,
+      contentType: type,
+      cacheControl: "31536000",
       upsert: false,
     });
   if (error) {
