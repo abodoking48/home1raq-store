@@ -13,6 +13,7 @@ const SKIP_LABEL: Record<NonNullable<ImageResult["skipped"]>, string> = {
   "not-smaller": "صغيرة أصلاً",
   unreadable: "ما تنقرا",
   "download-failed": "ما نزلت",
+  "og-exists": "موجودة",
 };
 
 export function RecompressImages() {
@@ -46,7 +47,8 @@ export function RecompressImages() {
     }
   }
 
-  const done = results.filter((r) => r.after != null && !r.skipped);
+  const done = results.filter((r) => r.after != null && !r.skipped && r.kind !== "og");
+  const previews = results.filter((r) => r.kind === "og" && !r.skipped).length;
   const before = done.reduce((s, r) => s + r.before, 0);
   const after = done.reduce((s, r) => s + (r.after ?? 0), 0);
 
@@ -67,6 +69,9 @@ export function RecompressImages() {
             {finished === "dry" ? "نتيجة التجربة: " : finished === "real" ? "خلص الضغط: " : "شغال… "}
             {done.length} صورة، من {kb(before)} إلى {kb(after)}
             {before > 0 && ` (توفير ${Math.round((1 - after / before) * 100)}%)`}
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            صور معاينة الواتساب {finished === "dry" ? "اللي ناقصة" : "اللي انسوت"}: {previews}
           </p>
           <ul className="mt-3 max-h-[50svh] space-y-1 overflow-y-auto text-xs text-muted-foreground">
             {results.map((r, i) => (

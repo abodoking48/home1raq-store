@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { after } from "next/server";
 import { formatIqd } from "@/lib/currency";
 import { prisma } from "@/lib/prisma";
+import { shortProductUrl } from "@/lib/site";
 import { createProduct, uniqueProductSlug } from "@/lib/products/create";
 import { uploadProductImage } from "@/lib/products/upload";
 import {
@@ -309,8 +310,10 @@ async function handleCallback(cb: NonNullable<TgUpdate["callback_query"]>) {
       data: { status: "PUBLISHED", productSlug: product.slug },
     });
     const url = productUrl(product.slug);
+    const shareUrl = shortProductUrl(product.id);
     await editText(
-      `✅ <b>انتشر المنتج!</b>\n${escapeHtml(product.name)}\n\n${escapeHtml(url)}`,
+      `✅ <b>انتشر المنتج!</b>\n${escapeHtml(product.name)}\n\n` +
+        `<b>رابط المشاركة (للواتساب):</b>\n${escapeHtml(shareUrl)}`,
       { reply_markup: { inline_keyboard: [[{ text: "🔗 افتح المنتج", url }]] } },
     );
   } catch (e) {
