@@ -8,12 +8,11 @@ import {
 } from "@/components/product/product-detail-page";
 import { productPath, SITE_URL } from "@/lib/site";
 
-/** ISR: crawlers (WhatsApp, Facebook) get cached HTML; product saves revalidate it on demand. */
-export const revalidate = 3600;
-/** Nothing prebuilt at deploy; each product is rendered on its first visit, then cached. */
-export async function generateStaticParams() {
-  return [];
-}
+/**
+ * Rendered per request. ISR here returned Vercel's static 500 for every Arabic (percent-encoded)
+ * slug in production, while the ASCII `/p/<id>` share link — which crawlers get — stays ISR.
+ */
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
