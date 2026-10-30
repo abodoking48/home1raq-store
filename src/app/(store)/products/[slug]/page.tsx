@@ -13,6 +13,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { buildSlugCandidates } from "@/lib/product-slug";
 import { prisma } from "@/lib/prisma";
 import { formatIqdNumber } from "@/lib/currency";
+import { OG_IMAGE, productOgImageUrl, productShareDescription } from "@/lib/og";
 import { productPath } from "@/lib/site";
 import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
@@ -38,17 +39,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return { title: `المنتج غير موجود | ${siteCopy.brand.name}` };
 
   const title = `${product.name} | ${siteCopy.brand.name}`;
-  const firstLine = product.description.split(/\r?\n/).find((l) => l.trim())?.trim() ?? "";
-  const description = `${formatIqdNumber(Number(product.price))} د.ع — ${DELIVERY.sentence}. ${firstLine}`.slice(0, 200);
+  const description = productShareDescription(product.name, Number(product.price), product.description);
   const url = productPath(product.slug);
-  const images = product.images[0] ? [{ url: product.images[0], alt: product.name }] : undefined;
+  // Our own small JPEG, not the Supabase original (often a multi-MB PNG WhatsApp won't preview).
+  const image = productOgImageUrl(product.id, product.updatedAt);
+  const images = [{ url: image, secureUrl: image, ...OG_IMAGE, alt: product.name }];
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: { type: "website", siteName: siteCopy.brand.name, locale: "ar_IQ", url, title, description, images },
-    twitter: { card: "summary_large_image", title, description, images: images?.map((i) => i.url) },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
+    // Next's openGraph has no og:type=product; these are still read by Facebook/Meta catalogs.
+    other: {
+      "product:price:amount": String(Number(product.price)),
+      "product:price:currency": "IQD",
+    },
   };
 }
 
