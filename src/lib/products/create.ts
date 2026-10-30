@@ -1,6 +1,6 @@
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { refreshProductPages } from "@/lib/products/refresh";
 import { slugify } from "@/lib/slug";
 
 /** Shared by the admin API (`/api/admin/products`) and the Telegram bot. */
@@ -45,13 +45,8 @@ export async function createProduct(data: ProductCreateInput) {
     include: { category: true },
   });
 
-  // Listing pages use ISR (revalidate = 3600); refresh so the new product shows now.
-  try {
-    revalidatePath("/");
-    revalidatePath("/products");
-  } catch (e) {
-    console.error("[products] revalidate failed:", e);
-  }
+  // Renders the link preview, then refreshes the ISR pages so the product shows now.
+  await refreshProductPages(product);
 
   return product;
 }

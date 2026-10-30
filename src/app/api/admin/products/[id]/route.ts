@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { getAdminUser } from "@/lib/auth/admin";
 import { prisma } from "@/lib/prisma";
+import { refreshProductPages } from "@/lib/products/refresh";
 import { slugify } from "@/lib/slug";
 
 const patchSchema = z.object({
@@ -78,6 +79,7 @@ export async function PATCH(req: Request, ctx: RouteContext) {
       },
       include: { category: true },
     });
+    await refreshProductPages(product);
     return NextResponse.json({ product });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientValidationError) {
@@ -100,6 +102,7 @@ const ARCHIVED_MESSAGE =
 /** Order lines keep pointing at the product, so a product that was ever ordered is hidden, never deleted. */
 async function archive(id: string, orders: number) {
   await prisma.product.update({ where: { id }, data: { active: false } });
+  await refreshProductPages();
   return NextResponse.json({ ok: true, archived: true, orders, message: ARCHIVED_MESSAGE });
 }
 
@@ -123,6 +126,7 @@ export async function DELETE(_req: Request, ctx: RouteContext) {
 
     // Landing-page lines cascade; nothing else references a product.
     await prisma.product.delete({ where: { id } });
+    await refreshProductPages();
     return NextResponse.json({ ok: true, archived: false });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {

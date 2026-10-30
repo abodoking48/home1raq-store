@@ -9,7 +9,7 @@ export const maxDuration = 60;
 
 const bodySchema = z.object({
   dryRun: z.boolean(),
-  cursor: z.object({ kind: z.enum(["product", "category", "landing"]), after: z.string() }).nullable(),
+  cursor: z.object({ kind: z.enum(["product", "category", "landing", "og"]), after: z.string() }).nullable(),
 });
 
 export async function POST(req: Request) {

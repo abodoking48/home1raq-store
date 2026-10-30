@@ -1,5 +1,7 @@
 import { compressImage } from "@/lib/images/compress";
+import { ensureProductOg } from "@/lib/og-image";
 import { prisma } from "@/lib/prisma";
+import { refreshProductPages } from "@/lib/products/refresh";
 import { storeImage } from "@/lib/products/upload";
 
 /**
@@ -8,9 +10,11 @@ import { storeImage } from "@/lib/products/upload";
  * New files get new names and the old ones stay in storage, so nothing is lost.
  */
 
-export type RecompressKind = "product" | "category" | "landing";
-const KINDS: RecompressKind[] = ["product", "category", "landing"];
+export type RecompressKind = "product" | "category" | "landing" | "og";
+/** "og" runs last, so link previews are rendered from the already-compressed photos. */
+const KINDS: RecompressKind[] = ["product", "category", "landing", "og"];
 const BATCH = 4;
+const OG_WHERE = (after: string) => ({ id: { gt: after }, active: true, NOT: { images: { isEmpty: true } } });
 
 export type RecompressCursor = { kind: RecompressKind; after: string };
 
@@ -22,7 +26,7 @@ export type ImageResult = {
   after: number | null;
   /** Set when the new file was stored (not in a dry run). */
   newUrl?: string;
-  skipped?: "not-ours" | "already-webp" | "not-smaller" | "unreadable" | "download-failed";
+  skipped?: "not-ours" | "already-webp" | "not-smaller" | "unreadable" | "download-failed" | "og-exists";
 };
 
 export type RecompressBatch = { results: ImageResult[]; next: RecompressCursor | null };
@@ -81,6 +85,7 @@ export async function recompressBatch(
   const after = cursor?.after ?? "";
   const results: ImageResult[] = [];
   let lastId: string | null = null;
+  let productsChanged = false;
 
   if (kind === "product") {
     const rows = await prisma.product.findMany({
@@ -92,7 +97,10 @@ export async function recompressBatch(
     for (const row of rows) {
       const r = await recompressList(kind, row.name, row.images, dryRun);
       results.push(...r.results);
-      if (r.changed) await prisma.product.update({ where: { id: row.id }, data: { images: r.replaced } });
+      if (r.changed) {
+        await prisma.product.update({ where: { id: row.id }, data: { images: r.replaced } });
+        productsChanged = true;
+      }
       lastId = row.id;
     }
   } else if (kind === "category") {
@@ -106,6 +114,21 @@ export async function recompressBatch(
       const r = await recompressList(kind, row.name, row.iconUrl ? [row.iconUrl] : [], dryRun);
       results.push(...r.results);
       if (r.changed) await prisma.category.update({ where: { id: row.id }, data: { iconUrl: r.replaced[0] } });
+      lastId = row.id;
+    }
+  } else if (kind === "og") {
+    const rows = await prisma.product.findMany({
+      where: OG_WHERE(after),
+      orderBy: { id: "asc" },
+      take: BATCH,
+      select: { id: true, name: true, images: true },
+    });
+    for (const row of rows) {
+      const og = await ensureProductOg(row, { dryRun });
+      const base = { kind, label: `${row.name} (معاينة)`, before: 0 };
+      if (!og) results.push({ ...base, url: row.images[0], after: null, skipped: "download-failed" });
+      else if (!og.created) results.push({ ...base, url: og.url, after: og.bytes, skipped: "og-exists" });
+      else results.push({ ...base, url: og.url, after: og.bytes, ...(dryRun ? {} : { newUrl: og.url }) });
       lastId = row.id;
     }
   } else {
@@ -125,6 +148,8 @@ export async function recompressBatch(
     }
   }
 
+  if (productsChanged && !dryRun) await refreshProductPages();
+
   // Nothing left of this kind: move on to the next one.
   if (lastId && (await hasMore(kind, lastId))) {
     return { results, next: { kind, after: lastId } };
@@ -135,6 +160,7 @@ export async function recompressBatch(
 
 async function hasMore(kind: RecompressKind, after: string) {
   if (kind === "product") return (await prisma.product.count({ where: { id: { gt: after } } })) > 0;
+  if (kind === "og") return (await prisma.product.count({ where: OG_WHERE(after) })) > 0;
   if (kind === "category") {
     return (await prisma.category.count({ where: { id: { gt: after }, iconUrl: { not: null } } })) > 0;
   }
