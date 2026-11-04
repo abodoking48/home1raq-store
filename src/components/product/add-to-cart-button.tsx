@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { trackAddToCart, trackViewContent } from "@/lib/ads";
 import { formatIqdNumber } from "@/lib/currency";
-import { SITE_URL, productPath } from "@/lib/site";
+import { shortProductUrl } from "@/lib/site";
 import { whatsappLink } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
@@ -46,9 +46,10 @@ export function TrackViewContent({ productId, name, price }: Pick<Props, "produc
   return null;
 }
 
-export function productWhatsappHref(name: string, price: number, slug: string) {
+/** The short ASCII link: WhatsApp previews and opens it reliably, unlike the long Arabic slug URL. */
+export function productWhatsappHref(name: string, price: number, productId: string) {
   return whatsappLink(
-    `مرحباً Home1raq، أريد أطلب:\n${name}\nالسعر: ${formatIqdNumber(price)} د.ع\n${SITE_URL}${productPath(slug)}`,
+    `مرحباً Home1raq، أريد أطلب:\n${name}\nالسعر: ${formatIqdNumber(price)} د.ع\n${shortProductUrl(productId)}`,
   );
 }
 
@@ -76,7 +77,7 @@ export function AddToCartButton(props: Props) {
         </Button>
       </div>
       <a
-        href={productWhatsappHref(props.name, props.price, props.slug)}
+        href={productWhatsappHref(props.name, props.price, props.productId)}
         target="_blank"
         rel="noreferrer"
         className="flex w-full max-w-md items-center justify-center gap-2 rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 py-3.5 text-base font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20 sm:max-w-none"

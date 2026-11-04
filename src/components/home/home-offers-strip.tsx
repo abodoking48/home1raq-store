@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { formatIqdNumber } from "@/lib/currency";
-import { productPath } from "@/lib/site";
+import { productLinkPath } from "@/lib/site";
 import { siteCopy } from "@/lib/stitch-copy";
 
 type StripProduct = {
@@ -42,7 +42,7 @@ export function HomeOffersStrip({ products }: { products: StripProduct[] }) {
           return (
             <Link
               key={item.id}
-              href={productPath(item.slug)}
+              href={productLinkPath(item.id)}
               className="glass-panel w-36 shrink-0 snap-start overflow-hidden rounded-2xl md:w-auto"
             >
               <div className="relative aspect-square w-full bg-[#0a0c0b]">

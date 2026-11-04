@@ -9,12 +9,13 @@ import { Input } from "@/components/ui/input";
 import { trackMeta } from "@/lib/ads";
 import { matchesQuery, rankByQuery } from "@/lib/arabic";
 import { formatIqdNumber } from "@/lib/currency";
-import { productPath } from "@/lib/site";
+import { productLinkPath } from "@/lib/site";
 import { whatsappLink } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
 
 type IndexProduct = {
+  id: string;
   slug: string;
   name: string;
   price: number;
@@ -82,7 +83,7 @@ export function HeaderSearch({ initialQuery }: { initialQuery: string }) {
     if (!q || !index) return [];
     const products = rankByQuery(index.products, q, (p) => ({ name: p.name, category: p.category }))
       .slice(0, 6)
-      .map((item): Option => ({ kind: "product", href: productPath(item.slug), item }));
+      .map((item): Option => ({ kind: "product", href: productLinkPath(item.id), item }));
     const categories = index.categories
       .filter((c) => matchesQuery(c.name, q))
       .slice(0, 3)

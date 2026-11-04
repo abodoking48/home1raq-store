@@ -84,7 +84,9 @@ export function ProductImageGallery({ images, productName }: Props) {
               src={images[index]}
               alt={`${productName} — ${index + 1}`}
               fill
-              priority={index === 0}
+              // The main photo is the page's largest paint: preload it with the HTML at high priority.
+              preload={index === 0}
+              fetchPriority={index === 0 ? "high" : "auto"}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
