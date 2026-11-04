@@ -1,6 +1,6 @@
 import { ProductPageSkeleton } from "@/components/product/product-page-skeleton";
 
-/** Overrides the listing skeleton from /products/loading.tsx with the product-page layout. */
+/** The listing grid skeleton lives in products/(list)/, so it never covers a product page. */
 export default function ProductLoading() {
   return <ProductPageSkeleton />;
 }

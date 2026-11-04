@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import dynamicImport from "next/dynamic";
+import { FirstVisitSplash } from "@/components/home/first-visit-splash";
 import { HeroSection } from "@/components/home/hero-section";
 import { HomeCategories } from "@/components/home/home-categories";
 import { HomeCategoriesReveal } from "@/components/home/home-categories-reveal";
@@ -114,6 +115,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative overflow-hidden">
+      <FirstVisitSplash />
       {dbUnavailable ? (
         <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-100">
           تعذر الاتصال بقاعدة البيانات مؤقتاً. تحقق من الإنترنت، من أن مشروع Supabase
