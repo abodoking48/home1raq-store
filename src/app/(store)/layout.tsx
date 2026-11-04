@@ -1,3 +1,5 @@
+import { NavProgress } from "@/components/layout/nav-progress";
+import { ProductPrefetch } from "@/components/layout/product-prefetch";
 import { StoreFooter } from "@/components/layout/store-footer";
 import { StoreHeader } from "@/components/layout/store-header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
@@ -9,10 +11,12 @@ export default function StoreLayout({
 }) {
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
+      <NavProgress />
       <StoreHeader />
       <main className="flex-1 pt-20">{children}</main>
       <StoreFooter />
       <WhatsAppButton />
+      <ProductPrefetch />
     </div>
   );
 }

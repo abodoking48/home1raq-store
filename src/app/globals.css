@@ -218,3 +218,123 @@
   0% { transform: translateX(-120%); }
   100% { transform: translateX(320%); }
 }
+
+/* First-visit splash (home page). The node is created by an inline script (see
+   first-visit-splash.tsx), so without JS there is no splash at all; with JS the CSS alone still
+   fades it out at 1.2 s even if the rest of the script never runs. */
+#h1q-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  /* Solid base under the glow, so no part of the page shows through. */
+  background: radial-gradient(circle at 50% 42%, rgba(0, 255, 136, 0.12) 0%, transparent 60%), #020403;
+  color: #fff;
+  pointer-events: none;
+  animation: h1q-splash-out 0.35s ease-in 1.2s forwards;
+}
+#h1q-splash.is-out {
+  animation: h1q-splash-out 0.35s ease-in forwards;
+}
+#h1q-splash .h1q-tile {
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  border: 1.5px solid rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.08);
+  display: grid;
+  place-items: center;
+  animation: h1q-glow 1.2s ease-in-out infinite;
+}
+#h1q-splash .h1q-tile path {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  animation: h1q-draw 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+#h1q-splash .h1q-tile path + path {
+  animation-delay: 0.2s;
+}
+#h1q-splash .h1q-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  animation: h1q-rise 0.45s ease-out 0.25s forwards;
+}
+#h1q-splash .h1q-name b {
+  color: #00ff88;
+}
+#h1q-splash .h1q-line {
+  width: 120px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+#h1q-splash .h1q-line::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #00ff88;
+  box-shadow: 0 0 10px #00ff88;
+  transform-origin: right; /* RTL: fills from the right */
+  transform: scaleX(0);
+  animation: h1q-fill 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes h1q-draw { to { stroke-dashoffset: 0; } }
+@keyframes h1q-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes h1q-fill { to { transform: scaleX(1); } }
+@keyframes h1q-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(0, 255, 136, 0); }
+  50% { box-shadow: 0 0 34px rgba(0, 255, 136, 0.35); }
+}
+@keyframes h1q-splash-out { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  #h1q-splash { display: none; }
+}
+
+/* Product skeleton: neon-tinted sweep (right to left, RTL). */
+.h1q-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.h1q-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(100%);
+  background: linear-gradient(
+    270deg,
+    transparent 0%,
+    rgba(0, 255, 136, 0.06) 35%,
+    rgba(0, 255, 136, 0.16) 50%,
+    rgba(0, 255, 136, 0.06) 65%,
+    transparent 100%
+  );
+  animation: h1q-sweep 1.4s ease-in-out infinite;
+}
+@keyframes h1q-sweep { to { transform: translateX(-100%); } }
+
+/* Route-change progress bar (top of the viewport). */
+.h1q-navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 90;
+  height: 2.5px;
+  width: 100%;
+  background: #00ff88;
+  box-shadow: 0 0 10px #00ff88, 0 0 4px #00ff88;
+  transform-origin: right;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.3s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .h1q-shimmer::after { animation: none; }
+}
