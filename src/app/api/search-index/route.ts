@@ -10,6 +10,7 @@ export async function GET() {
       where: { active: true },
       orderBy: { updatedAt: "desc" },
       select: {
+        id: true,
         slug: true,
         name: true,
         price: true,
@@ -28,6 +29,7 @@ export async function GET() {
 
   return NextResponse.json({
     products: products.map((p) => ({
+      id: p.id,
       slug: p.slug,
       name: p.name,
       price: Number(p.price),

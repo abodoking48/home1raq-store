@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatIqdNumber } from "@/lib/currency";
+import { productLinkPath } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export type ProductCardProps = {
@@ -20,7 +21,7 @@ export type ProductCardProps = {
 };
 
 export function ProductCard({
-  slug,
+  id,
   name,
   price,
   compareAtPrice,
@@ -37,7 +38,7 @@ export function ProductCard({
 
   return (
     <article className={cn("group", className)}>
-      <Link href={`/products/${encodeURIComponent(slug)}`} className="block">
+      <Link href={productLinkPath(id)} className="block">
         <div
           className={cn(
             "relative overflow-hidden transition-transform duration-300 group-hover:-translate-y-1",

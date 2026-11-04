@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { formatIqd } from "@/lib/currency";
+import { productLinkPath } from "@/lib/site";
 import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 import { cn } from "@/lib/utils";
@@ -60,7 +61,7 @@ export default function CartPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/products/${encodeURIComponent(line.slug)}`}
+                    href={productLinkPath(line.productId)}
                     className="text-lg font-bold hover:text-primary"
                   >
                     {line.name}
