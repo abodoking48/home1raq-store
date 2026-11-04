@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cache } from "react";
 import { CustomerReviews } from "@/components/home/customer-reviews";
 import {
   AddToCartButton,
@@ -10,32 +9,20 @@ import {
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductCard } from "@/components/product/product-card";
 import { ShareButton } from "@/components/product/share-button";
-import { buildSlugCandidates } from "@/lib/product-slug";
-import { prisma } from "@/lib/prisma";
 import { formatIqdNumber } from "@/lib/currency";
 import { OG_IMAGE, productOgImageUrl, productShareDescription } from "@/lib/og";
-import { ensureProductOg } from "@/lib/og-image";
+import {
+  type DetailProduct,
+  getProductOgUrl,
+  getRelatedProducts,
+} from "@/lib/products/detail-data";
 import { productPath, shortProductUrl } from "@/lib/site";
 import { DELIVERY } from "@/lib/store-info";
 import { siteCopy } from "@/lib/stitch-copy";
 
 /** Shared by `/products/[slug]` and the short share link `/p/[id]`. */
 
-export const getProductBySlug = cache(async (slug: string) =>
-  prisma.product.findFirst({
-    where: {
-      active: true,
-      OR: buildSlugCandidates(slug).map((s) => ({ slug: s })),
-    },
-    include: { category: true },
-  }),
-);
-
-export const getProductById = cache(async (id: string) =>
-  prisma.product.findFirst({ where: { id, active: true }, include: { category: true } }),
-);
-
-type DetailProduct = NonNullable<Awaited<ReturnType<typeof getProductById>>>;
+export { getProductById, getProductBySlug } from "@/lib/products/detail-data";
 
 export const notFoundMetadata: Metadata = { title: `المنتج غير موجود | ${siteCopy.brand.name}` };
 
@@ -45,11 +32,11 @@ export const notFoundMetadata: Metadata = { title: `المنتج غير موجو
  */
 export async function productMetadata(product: DetailProduct, ogUrl: string): Promise<Metadata> {
   const title = `${product.name} | ${siteCopy.brand.name}`;
-  const description = productShareDescription(product.name, Number(product.price), product.description);
-  // A pre-rendered static JPEG in Storage (made on save; made here once if missing). Pages are ISR,
-  // so this runs once per revalidation, not per crawler hit.
-  const stored = await ensureProductOg(product);
-  const image = stored?.url ?? productOgImageUrl(product.id, product.updatedAt);
+  const description = productShareDescription(product.name, product.price, product.description);
+  // The pre-rendered static JPEG in Storage (made on save); its existence check is cached, so a
+  // render normally does no Storage round trip.
+  const stored = await getProductOgUrl(product.id, product.images[0]);
+  const image = stored ?? productOgImageUrl(product.id, new Date(product.updatedAt));
   const images = [{ url: image, secureUrl: image, ...OG_IMAGE, alt: product.name }];
 
   return {
@@ -60,25 +47,16 @@ export async function productMetadata(product: DetailProduct, ogUrl: string): Pr
     twitter: { card: "summary_large_image", title, description, images: [image] },
     // Next's openGraph has no og:type=product; these are still read by Facebook/Meta catalogs.
     other: {
-      "product:price:amount": String(Number(product.price)),
+      "product:price:amount": String(product.price),
       "product:price:currency": "IQD",
     },
   };
 }
 
 export async function ProductDetail({ product }: { product: DetailProduct }) {
-  const price = Number(product.price);
-  const compareAt =
-    product.compareAtPrice != null ? Number(product.compareAtPrice) : null;
-  const related = await prisma.product.findMany({
-    where: {
-      active: true,
-      categoryId: product.categoryId ?? undefined,
-      NOT: { id: product.id },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 4,
-  });
+  const price = product.price;
+  const compareAt = product.compareAtPrice;
+  const related = await getRelatedProducts(product.categoryId, product.id);
 
 
   return (
